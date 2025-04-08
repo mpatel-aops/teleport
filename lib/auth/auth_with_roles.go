@@ -48,7 +48,6 @@ import (
 	apievents "github.com/gravitational/teleport/api/types/events"
 	"github.com/gravitational/teleport/api/types/wrappers"
 	"github.com/gravitational/teleport/api/utils"
-	apiutils "github.com/gravitational/teleport/api/utils"
 	"github.com/gravitational/teleport/api/utils/keys/hardwarekey"
 	"github.com/gravitational/teleport/entitlements"
 	"github.com/gravitational/teleport/lib/auth/authclient"
@@ -1623,7 +1622,7 @@ func (a *ServerWithRoles) GetSSHTargets(ctx context.Context, req *proto.GetSSHTa
 		caseInsensitiveRouting = cfg.GetCaseInsensitiveRouting()
 	}
 
-	matcher, err := apiutils.NewSSHRouteMatcherFromConfig(apiutils.SSHRouteMatcherConfig{
+	matcher, err := utils.NewSSHRouteMatcherFromConfig(utils.SSHRouteMatcherConfig{
 		Host:                      req.Host,
 		Port:                      req.Port,
 		CaseInsensitive:           caseInsensitiveRouting,
@@ -3082,7 +3081,7 @@ func (a *ServerWithRoles) desiredAccessInfoForUser(ctx context.Context, req *pro
 			}
 		}
 	}
-	finalRequestIDs = apiutils.Deduplicate(finalRequestIDs)
+	finalRequestIDs = utils.Deduplicate(finalRequestIDs)
 
 	// Replace req.AccessRequests with final filtered values, these will be
 	// encoded into the cert.
@@ -3117,7 +3116,7 @@ func (a *ServerWithRoles) desiredAccessInfoForUser(ctx context.Context, req *pro
 			accessInfo.AllowedResourceIDs = requestedResourceIDs
 		}
 	}
-	accessInfo.Roles = apiutils.Deduplicate(accessInfo.Roles)
+	accessInfo.Roles = utils.Deduplicate(accessInfo.Roles)
 
 	return accessInfo, nil
 }

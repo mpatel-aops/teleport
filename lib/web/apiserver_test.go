@@ -81,7 +81,6 @@ import (
 	"github.com/gravitational/teleport"
 	"github.com/gravitational/teleport/api/breaker"
 	authproto "github.com/gravitational/teleport/api/client/proto"
-	clientproto "github.com/gravitational/teleport/api/client/proto"
 	"github.com/gravitational/teleport/api/client/webclient"
 	"github.com/gravitational/teleport/api/constants"
 	apidefaults "github.com/gravitational/teleport/api/defaults"
@@ -1431,7 +1430,7 @@ func TestUnifiedResourcesGet(t *testing.T) {
 	res = clusterNodesGetResponse{}
 	require.NoError(t, json.Unmarshal(re.Bytes(), &res))
 	require.Len(t, res.Items, 15)
-	require.NotEqual(t, "", res.StartKey)
+	require.NotEmpty(t, res.StartKey)
 
 	// should return second page and have no third page
 	query = url.Values{"sort": []string{"name"}, "limit": []string{"15"}}
@@ -1441,7 +1440,7 @@ func TestUnifiedResourcesGet(t *testing.T) {
 	res = clusterNodesGetResponse{}
 	require.NoError(t, json.Unmarshal(re.Bytes(), &res))
 	require.Len(t, res.Items, 11)
-	require.Equal(t, "", res.StartKey)
+	require.Empty(t, res.StartKey)
 
 	// Only list valid AWS Roles for AWS Apps
 	query = url.Values{
@@ -8071,7 +8070,7 @@ func (s *WebSuite) url() *url.URL {
 
 func removeSpace(in string) string {
 	for _, c := range []string{"\n", "\r", "\t"} {
-		in = strings.Replace(in, c, " ", -1)
+		in = strings.ReplaceAll(in, c, " ")
 	}
 	return strings.TrimSpace(in)
 }
@@ -9212,8 +9211,8 @@ func startKubeWithoutCleanup(ctx context.Context, t *testing.T, cfg startKubeOpt
 	require.NoError(t, err)
 
 	inventoryHandle, err := inventory.NewDownstreamHandle(client.InventoryControlStream,
-		func(ctx context.Context) (clientproto.UpstreamInventoryHello, error) {
-			return clientproto.UpstreamInventoryHello{
+		func(ctx context.Context) (authproto.UpstreamInventoryHello, error) {
+			return authproto.UpstreamInventoryHello{
 				ServerID: hostID,
 				Version:  teleport.Version,
 				Services: []types.SystemRole{role},
@@ -10921,15 +10920,15 @@ func Test_setEntitlementsWithLegacyLogic(t *testing.T) {
 			clusterFeatures: authproto.Features{
 				AccessControls: false,
 				AccessGraph:    false,
-				AccessList: &clientproto.AccessListFeature{
+				AccessList: &authproto.AccessListFeature{
 					CreateLimit: 10,
 				},
-				AccessMonitoring: &clientproto.AccessMonitoringFeature{
+				AccessMonitoring: &authproto.AccessMonitoringFeature{
 					Enabled:             false,
 					MaxReportRangeLimit: 20,
 				},
 				AccessMonitoringConfigured: false,
-				AccessRequests: &clientproto.AccessRequestsFeature{
+				AccessRequests: &authproto.AccessRequestsFeature{
 					MonthlyRequestLimit: 30,
 				},
 				AdvancedAccessWorkflows: false,
@@ -10940,7 +10939,7 @@ func Test_setEntitlementsWithLegacyLogic(t *testing.T) {
 				CustomTheme:             "theme",
 				DB:                      false,
 				Desktop:                 false,
-				DeviceTrust: &clientproto.DeviceTrustFeature{
+				DeviceTrust: &authproto.DeviceTrustFeature{
 					Enabled:           false,
 					DevicesUsageLimit: 40,
 				},
@@ -11088,21 +11087,21 @@ func Test_setEntitlementsWithLegacyLogic(t *testing.T) {
 				MobileDeviceManagement: true,
 				OIDC:                   true,
 				SAML:                   true,
-				AccessRequests: &clientproto.AccessRequestsFeature{
+				AccessRequests: &authproto.AccessRequestsFeature{
 					MonthlyRequestLimit: 88,
 				},
-				AccessList: &clientproto.AccessListFeature{
+				AccessList: &authproto.AccessListFeature{
 					CreateLimit: 88,
 				},
-				AccessMonitoring: &clientproto.AccessMonitoringFeature{
+				AccessMonitoring: &authproto.AccessMonitoringFeature{
 					Enabled:             true,
 					MaxReportRangeLimit: 88,
 				},
-				DeviceTrust: &clientproto.DeviceTrustFeature{
+				DeviceTrust: &authproto.DeviceTrustFeature{
 					Enabled:           true,
 					DevicesUsageLimit: 88,
 				},
-				Policy: &clientproto.PolicyFeature{
+				Policy: &authproto.PolicyFeature{
 					Enabled: true,
 				},
 			},
@@ -11208,21 +11207,21 @@ func Test_setEntitlementsWithLegacyLogic(t *testing.T) {
 				MobileDeviceManagement: true,
 				OIDC:                   true,
 				SAML:                   true,
-				AccessRequests: &clientproto.AccessRequestsFeature{
+				AccessRequests: &authproto.AccessRequestsFeature{
 					MonthlyRequestLimit: 88,
 				},
-				AccessList: &clientproto.AccessListFeature{
+				AccessList: &authproto.AccessListFeature{
 					CreateLimit: 88,
 				},
-				AccessMonitoring: &clientproto.AccessMonitoringFeature{
+				AccessMonitoring: &authproto.AccessMonitoringFeature{
 					Enabled:             true,
 					MaxReportRangeLimit: 88,
 				},
-				DeviceTrust: &clientproto.DeviceTrustFeature{
+				DeviceTrust: &authproto.DeviceTrustFeature{
 					Enabled:           true,
 					DevicesUsageLimit: 88,
 				},
-				Policy: &clientproto.PolicyFeature{
+				Policy: &authproto.PolicyFeature{
 					Enabled: true,
 				},
 			},
@@ -11322,11 +11321,11 @@ func Test_setEntitlementsWithLegacyLogic(t *testing.T) {
 				PremiumSupport:                 true,
 			},
 			clusterFeatures: authproto.Features{
-				DeviceTrust:      &clientproto.DeviceTrustFeature{},
-				AccessRequests:   &clientproto.AccessRequestsFeature{},
-				AccessList:       &clientproto.AccessListFeature{},
-				AccessMonitoring: &clientproto.AccessMonitoringFeature{},
-				Policy:           &clientproto.PolicyFeature{},
+				DeviceTrust:      &authproto.DeviceTrustFeature{},
+				AccessRequests:   &authproto.AccessRequestsFeature{},
+				AccessList:       &authproto.AccessListFeature{},
+				AccessMonitoring: &authproto.AccessMonitoringFeature{},
+				Policy:           &authproto.PolicyFeature{},
 			},
 			expected: &webclient.WebConfig{
 				Auth: webclient.WebConfigAuthSettings{

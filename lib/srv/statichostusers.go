@@ -26,7 +26,6 @@ import (
 	"github.com/gravitational/trace"
 	"github.com/jonboulle/clockwork"
 
-	userprovisioningpb "github.com/gravitational/teleport/api/gen/proto/go/teleport/userprovisioning/v2"
 	userprovisioningv2 "github.com/gravitational/teleport/api/gen/proto/go/teleport/userprovisioning/v2"
 	"github.com/gravitational/teleport/api/types"
 	"github.com/gravitational/teleport/api/types/label"
@@ -208,8 +207,8 @@ func (s *StaticHostUserHandler) run(ctx context.Context) error {
 	}
 }
 
-func (s *StaticHostUserHandler) handleNewHostUser(ctx context.Context, hostUser *userprovisioningpb.StaticHostUser) error {
-	var createUser *userprovisioningpb.Matcher
+func (s *StaticHostUserHandler) handleNewHostUser(ctx context.Context, hostUser *userprovisioningv2.StaticHostUser) error {
+	var createUser *userprovisioningv2.Matcher
 	login := hostUser.GetMetadata().Name
 	server := s.server.GetInfo()
 	for _, matcher := range hostUser.Spec.Matchers {

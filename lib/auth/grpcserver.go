@@ -3543,8 +3543,7 @@ func (g *GRPCServer) GetEvents(ctx context.Context, req *authpb.GetEventsRequest
 		return nil, trace.Wrap(err)
 	}
 
-	var res *authpb.Events = &authpb.Events{}
-
+	res := &authpb.Events{}
 	encodedEvents := make([]*apievents.OneOf, 0, len(rawEvents))
 
 	for _, rawEvent := range rawEvents {
@@ -3578,8 +3577,7 @@ func (g *GRPCServer) GetSessionEvents(ctx context.Context, req *authpb.GetSessio
 		return nil, trace.Wrap(err)
 	}
 
-	var res *authpb.Events = &authpb.Events{}
-
+	res := &authpb.Events{}
 	encodedEvents := make([]*apievents.OneOf, 0, len(rawEvents))
 
 	for _, rawEvent := range rawEvents {
