@@ -59,25 +59,6 @@ func TestIdentityCenterAccount(t *testing.T) {
 	fixturePack := newTestPack(t, ForAuth)
 	t.Cleanup(fixturePack.Close)
 
-	collect := func(ctx context.Context, src identityCenterAccountGetter) ([]services.IdentityCenterAccount, error) {
-		var result []services.IdentityCenterAccount
-		var pageToken pagination.PageRequestToken
-		for {
-			page, nextPage, err := src.ListIdentityCenterAccounts(ctx, 0, &pageToken)
-			if err != nil {
-				return nil, trace.Wrap(err)
-			}
-			result = append(result, page...)
-
-			if nextPage == pagination.EndOfList {
-				break
-			}
-
-			pageToken.Update(nextPage)
-		}
-		return result, nil
-	}
-
 	testResources153(t, fixturePack, testFuncs153[services.IdentityCenterAccount]{
 		newResource: func(s string) (services.IdentityCenterAccount, error) {
 			return services.IdentityCenterAccount{Account: newIdentityCenterAccount(s)}, nil
@@ -91,7 +72,23 @@ func TestIdentityCenterAccount(t *testing.T) {
 			return trace.Wrap(err)
 		},
 		list: func(ctx context.Context) ([]services.IdentityCenterAccount, error) {
-			return collect(ctx, fixturePack.identityCenter)
+			var result []services.IdentityCenterAccount
+			var pageToken pagination.PageRequestToken
+			for {
+				page, nextPage, err := fixturePack.identityCenter.ListIdentityCenterAccounts(ctx, 0, &pageToken)
+				if err != nil {
+					return nil, trace.Wrap(err)
+				}
+				result = append(result, page...)
+
+				if nextPage == pagination.EndOfList {
+					break
+				}
+
+				pageToken.Update(nextPage)
+			}
+
+			return result, nil
 		},
 		delete: func(ctx context.Context, id string) error {
 			return trace.Wrap(fixturePack.identityCenter.DeleteIdentityCenterAccount(
@@ -102,7 +99,23 @@ func TestIdentityCenterAccount(t *testing.T) {
 			return trace.Wrap(err)
 		},
 		cacheList: func(ctx context.Context) ([]services.IdentityCenterAccount, error) {
-			return collect(ctx, fixturePack.cache.identityCenterCache)
+			var result []services.IdentityCenterAccount
+			var pageToken pagination.PageRequestToken
+			for {
+				page, nextPage, err := fixturePack.cache.IdentityCenter.ListIdentityCenterAccounts(ctx, 0, &pageToken)
+				if err != nil {
+					return nil, trace.Wrap(err)
+				}
+				result = append(result, page...)
+
+				if nextPage == pagination.EndOfList {
+					break
+				}
+
+				pageToken.Update(nextPage)
+			}
+
+			return result, nil
 		},
 		cacheGet: func(ctx context.Context, id string) (services.IdentityCenterAccount, error) {
 			r, err := fixturePack.cache.identityCenterCache.GetIdentityCenterAccount(
