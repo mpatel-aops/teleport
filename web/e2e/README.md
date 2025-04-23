@@ -22,14 +22,11 @@ pnpm exec playwright install chromium
 ### Basic Commands
 
 ```bash
-# Run all tests with the default START_URL (https://localhost:3080/web/login)
-pnpm test
-
-# Run a specific test file.
+# Run a test  with the default START_URL (https://localhost:3080/web/login)
 pnpm test signup.spec.ts
 
-# Run tests against a specific START_URL.
-START_URL=https://teleport.dev pnpm test
+# Run a test with a specific START_URL.
+START_URL=https://teleport.dev pnpm test signup.spec.ts
 
 # Run tests with the Playwright UI, useful for debugging.
 pnpm test --ui
