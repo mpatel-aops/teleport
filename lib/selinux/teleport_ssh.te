@@ -17,6 +17,7 @@ require {
     type kernel_t;
     type lastlog_t;
     type machineid_t;
+    type pam_var_run_t;
     type passwd_exec_t;
     type passwd_file_t;
     type ptmx_t;
@@ -24,7 +25,9 @@ require {
     type security_t;
     type selinux_config_t;
     type sssd_var_lib_t;
+    type syslogd_var_run_t;
     type systemd_logind_t;
+    type systemd_unit_file_t;
     type systemd_systemctl_exec_t;
     type sysctl_net_t;
     type sysfs_t;
@@ -37,12 +40,13 @@ require {
     type var_run_t;
     type wtmp_t;
 
-    class capability { audit_control audit_write chown dac_override fowner fsetid net_admin net_bind_service setgid setuid sys_admin sys_resource };
+    class capability { audit_control audit_write chown dac_read_search dac_override fowner fsetid net_admin net_bind_service setgid setuid sys_admin sys_resource };
     class chr_file { append read write };
     class dbus { send_msg };
     class file { create getattr ioctl map open read remove_name setattr unlink write };
-    class filesystem getattr;
+    class filesystem { getattr mount unmount };
     class process { setsched transition };
+    class service { status };
     class sock_file { append create getattr open read setattr unlink write };
     class tcp_socket { accept listen name_bind name_connect };
 }
@@ -173,7 +177,7 @@ term_relabelto_all_ptys(teleport_ssh_t);
 term_use_ptmx(teleport_ssh_t);
 
 allow teleport_ssh_t devpts_t:chr_file { rw_chr_file_perms setattr };
-allow teleport_ssh_t self:capability { chown dac_override fowner fsetid setgid setuid sys_resource };
+allow teleport_ssh_t self:capability { chown dac_read_search dac_override fowner fsetid setgid setuid sys_resource };
 
 fs_search_cgroup_dirs(teleport_ssh_t);
 fs_rw_cgroup_files(teleport_ssh_t);
@@ -208,7 +212,7 @@ allow teleport_ssh_t self:perf_event { cpu kernel open write };
 allow teleport_ssh_t tracefs_t:file read_file_perms;
 allow teleport_ssh_t root_t:dir { add_name create mounton write };
 allow teleport_ssh_t self:capability sys_admin;
-# not avalible on RHEL 8
+# not available on RHEL 8
 optional_policy(`
     require { 
         class capability2 { bpf perfmon };
@@ -217,19 +221,33 @@ optional_policy(`
 ')
 
 # PAM
+allow teleport_ssh_t pam_var_run_t:dir list_dir_perms;
+allow teleport_ssh_t pam_var_run_t:file read_file_perms;
+
 allow teleport_ssh_t default_context_t:file read_file_perms;
 allow teleport_ssh_t devlog_t:lnk_file read_lnk_file_perms;
 allow teleport_ssh_t devlog_t:sock_file rw_sock_file_perms;
 
+allow teleport_ssh_t systemd_unit_file_t:service status;
+allow systemd_logind_t teleport_ssh_t:dbus send_msg;
+allow teleport_ssh_t syslogd_var_run_t:dir list_dir_perms;
+allow teleport_ssh_t syslogd_var_run_t:file { read_file_perms map };
+allow teleport_ssh_t tmpfs_t:filesystem getattr;
+
 # motd
-# not avalible on RHEL 8
+# not available on RHEL 8
 optional_policy(`
     require { 
-        type cockpit_var_run_t;
         type motd_var_run_t;
     };
     allow teleport_ssh_t motd_var_run_t:dir list_dir_perms;
     allow teleport_ssh_t motd_var_run_t:file read_file_perms;
+')
+
+optional_policy(`
+    require { 
+        type cockpit_var_run_t;
+    };
     allow teleport_ssh_t cockpit_var_run_t:lnk_file read_lnk_file_perms;
     allow teleport_ssh_t cockpit_var_run_t:file read_file_perms;
 ')
