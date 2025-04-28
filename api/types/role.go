@@ -500,6 +500,12 @@ func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []Kuber
 		case len(resources) == 1 && resources[0].Name == Wildcard && resources[0].Namespace == Wildcard:
 			return []KubernetesResource{{Kind: Wildcard, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, Group: Wildcard}}
 		default:
+			v6resources := slices.Clone(resources)
+			for i, r := range v6resources {
+				r.Group = Wildcard
+				v6resources[i] = r
+			}
+
 			for _, resource := range KubernetesResourcesKinds {
 				// Ignore Pod resources for older roles because Pods were already supported
 				// so we don't need to keep backwards compatibility for them.
@@ -508,9 +514,9 @@ func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []Kuber
 				if resource == KindKubePod || resource == KindNamespace {
 					continue
 				}
-				resources = append(resources, KubernetesResource{Kind: resource, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, Group: Wildcard})
+				v6resources = append(v6resources, KubernetesResource{Kind: resource, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, Group: Wildcard})
 			}
-			return resources
+			return v6resources
 		}
 	default:
 		return nil
@@ -1177,23 +1183,31 @@ func (r *RoleV6) CheckAndSetDefaults() error {
 					Kind:      KindKubePod,
 					Namespace: Wildcard,
 					Name:      Wildcard,
-					Group:     Wildcard,
 				},
 			}
 		}
-
-		setDefaultKubernetesVerbs(&r.Spec)
-		if err := validateRoleSpecKubeResources(r.Version, r.Spec); err != nil {
-			return trace.Wrap(err)
-		}
-
+		fallthrough
 	case V6:
 		setDefaultKubernetesVerbs(&r.Spec)
 		if err := validateRoleSpecKubeResources(r.Version, r.Spec); err != nil {
 			return trace.Wrap(err)
 		}
-	// TODO(@creack,@flyinghermit): Create a dedicate validation path for V8 once we have logic changes.
-	case V7, V8:
+	case V7:
+		// Kubernetes resources default to {kind:*, name:*, namespace:*, group:*} for v7 and v8 roles.
+		if len(r.Spec.Allow.KubernetesResources) == 0 && r.HasLabelMatchers(Allow, KindKubernetesCluster) {
+			r.Spec.Allow.KubernetesResources = []KubernetesResource{
+				{
+					Kind:      Wildcard,
+					Namespace: Wildcard,
+					Name:      Wildcard,
+					Verbs:     []string{Wildcard},
+				},
+			}
+		}
+		if err := validateRoleSpecKubeResources(r.Version, r.Spec); err != nil {
+			return trace.Wrap(err)
+		}
+	case V8:
 		// Kubernetes resources default to {kind:*, name:*, namespace:*, group:*} for v7 and v8 roles.
 		if len(r.Spec.Allow.KubernetesResources) == 0 && r.HasLabelMatchers(Allow, KindKubernetesCluster) {
 			r.Spec.Allow.KubernetesResources = []KubernetesResource{
@@ -1894,15 +1908,22 @@ func validateKubeResources(roleVersion string, kubeResources []KubernetesResourc
 		// Teleport does not support role versions < v3.
 		case V6, V5, V4, V3:
 			if kubeResource.Kind != KindKubePod {
-				return trace.BadParameter("KubernetesResource %q is not supported in role version %q. Upgrade the role version to %q", kubeResource.Kind, roleVersion, V8)
+				return trace.BadParameter("KubernetesResource kind %q is not supported in role version %q. Upgrade the role version to %q", kubeResource.Kind, roleVersion, V8)
 			}
 			if len(kubeResource.Verbs) != 1 || kubeResource.Verbs[0] != Wildcard {
 				return trace.BadParameter("Role version %q only supports %q verb. Upgrade the role version to %q", roleVersion, Wildcard, V8)
 			}
 			fallthrough
 		case V7:
-			if kubeResource.Group != "" && kubeResource.Group != Wildcard {
+			if kubeResource.Group != "" {
 				return trace.BadParameter("Group %q is not supported in role version %q. Upgrade the role version to %q", kubeResource.Group, roleVersion, V8)
+			}
+			if !slices.Contains(KubernetesResourcesKinds, kubeResource.Kind) && kubeResource.Kind != Wildcard {
+				return trace.BadParameter("KubernetesResource kind %q is invalid or unsupported; Supported: %v", kubeResource.Kind, append([]string{Wildcard}, KubernetesResourcesKinds...))
+			}
+		case V8:
+			if kubeResource.Group == "" {
+				return trace.BadParameter("KubernetesResource group is required in role version %q", roleVersion)
 			}
 		}
 
