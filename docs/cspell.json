@@ -1010,6 +1010,7 @@
     "vmcopy",
     "vmjm",
     "vnet",
+    "vnetd",
     "vtgate",
     "walkthrough",
     "watcherjob",
