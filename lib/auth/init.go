@@ -365,6 +365,9 @@ type InitConfig struct {
 
 	// HealthCheckConfig manages health check config resources.
 	HealthCheckConfig services.HealthCheckConfig
+
+	// VnetConfigService manages the VNet config resource.
+	VnetConfigService services.VnetConfigService
 }
 
 // Init instantiates and configures an instance of AuthServer
