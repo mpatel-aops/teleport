@@ -29,16 +29,18 @@ import (
 	"github.com/gravitational/teleport/lib/utils/pagination"
 )
 
-const identityCenterAccountStoreNameIndex = "name"
+type identityCenterAccountStoreIndex string
 
-func newIdentityCenterAccountCollection(ic services.IdentityCenter, w types.WatchKind) (*collection[*identitycenterv1.Account], error) {
+const identityCenterAccountStoreNameIndex identityCenterAccountStoreIndex = "name"
+
+func newIdentityCenterAccountCollection(ic services.IdentityCenter, w types.WatchKind) (*collection[*identitycenterv1.Account, identityCenterAccountStoreIndex], error) {
 	if ic == nil {
 		return nil, trace.BadParameter("missing parameter IdentityCenter")
 	}
 
-	return &collection[*identitycenterv1.Account]{
-		store: newStore(map[string]func(*identitycenterv1.Account) string{
-			userGroupStoreNameIndex: func(r *identitycenterv1.Account) string {
+	return &collection[*identitycenterv1.Account, identityCenterAccountStoreIndex]{
+		store: newStore(map[identityCenterAccountStoreIndex]func(*identitycenterv1.Account) string{
+			identityCenterAccountStoreNameIndex: func(r *identitycenterv1.Account) string {
 				return r.GetMetadata().GetName()
 			},
 		}),
@@ -75,8 +77,6 @@ func newIdentityCenterAccountCollection(ic services.IdentityCenter, w types.Watc
 	}, nil
 }
 
-const identityCenterAccountAssignmentStoreNameIndex = "name"
-
 func (c *Cache) GetIdentityCenterAccount(ctx context.Context, name services.IdentityCenterAccountID) (services.IdentityCenterAccount, error) {
 	ctx, span := c.Tracer.Start(ctx, "cache/GetIdentityCenterAccount")
 	defer span.End()
@@ -92,13 +92,12 @@ func (c *Cache) GetIdentityCenterAccount(ctx context.Context, name services.Iden
 		return account, trace.Wrap(err)
 	}
 
-	account, err := rg.store.get(userStoreNameIndex, string(name))
+	account, err := rg.store.get(identityCenterAccountStoreNameIndex, string(name))
 	if err != nil {
 		return services.IdentityCenterAccount{}, trace.Wrap(err)
 	}
 
 	return services.IdentityCenterAccount{Account: utils.CloneProtoMsg(account)}, nil
-
 }
 
 func (c *Cache) ListIdentityCenterAccounts(ctx context.Context, pageSize int, token *pagination.PageRequestToken) ([]services.IdentityCenterAccount, pagination.NextPageToken, error) {
@@ -126,7 +125,7 @@ func (c *Cache) ListIdentityCenterAccounts(ctx context.Context, pageSize int, to
 		return nil, "", trace.Wrap(err)
 	}
 
-	for account := range rg.store.resources(identityCenterAccountAssignmentStoreNameIndex, startKey, "") {
+	for account := range rg.store.resources(identityCenterAccountStoreNameIndex, startKey, "") {
 		if len(accounts) == pageSize {
 			return accounts, pagination.NextPageToken(account.Metadata.GetName()), nil
 		}
@@ -137,13 +136,17 @@ func (c *Cache) ListIdentityCenterAccounts(ctx context.Context, pageSize int, to
 	return accounts, "", nil
 }
 
-func newIdentityCenterAccountAssignmentCollection(ic services.IdentityCenter, w types.WatchKind) (*collection[*identitycenterv1.AccountAssignment], error) {
+type identityCenterAccountAssignmentStoreIndex string
+
+const identityCenterAccountAssignmentStoreNameIndex identityCenterAccountAssignmentStoreIndex = "name"
+
+func newIdentityCenterAccountAssignmentCollection(ic services.IdentityCenter, w types.WatchKind) (*collection[*identitycenterv1.AccountAssignment, identityCenterAccountAssignmentStoreIndex], error) {
 	if ic == nil {
 		return nil, trace.BadParameter("missing parameter IdentityCenter")
 	}
 
-	return &collection[*identitycenterv1.AccountAssignment]{
-		store: newStore(map[string]func(*identitycenterv1.AccountAssignment) string{
+	return &collection[*identitycenterv1.AccountAssignment, identityCenterAccountAssignmentStoreIndex]{
+		store: newStore(map[identityCenterAccountAssignmentStoreIndex]func(*identitycenterv1.AccountAssignment) string{
 			identityCenterAccountAssignmentStoreNameIndex: func(r *identitycenterv1.AccountAssignment) string {
 				return r.GetMetadata().GetName()
 			},
@@ -230,7 +233,7 @@ func (c *Cache) ListAccountAssignments(ctx context.Context, pageSize int, pageTo
 	}
 
 	var assignments []services.IdentityCenterAccountAssignment
-	for assignment := range rg.store.resources(roleStoreNameIndex, token, "") {
+	for assignment := range rg.store.resources(identityCenterAccountAssignmentStoreNameIndex, token, "") {
 		if len(assignments) == pageSize {
 			return assignments, pagination.NextPageToken(assignment.GetMetadata().Name), nil
 		}

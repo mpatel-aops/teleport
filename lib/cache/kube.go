@@ -25,15 +25,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const kubeServerStoreNameIndex = "name"
+type kubeServerStoreIndex string
 
-func newKubernetesServerCollection(p services.Presence, w types.WatchKind) (*collection[types.KubeServer], error) {
+const kubeServerStoreNameIndex kubeServerStoreIndex = "name"
+
+func newKubernetesServerCollection(p services.Presence, w types.WatchKind) (*collection[types.KubeServer, kubeServerStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.KubeServer]{
-		store: newStore(map[string]func(types.KubeServer) string{
+	return &collection[types.KubeServer, kubeServerStoreIndex]{
+		store: newStore(map[kubeServerStoreIndex]func(types.KubeServer) string{
 			kubeServerStoreNameIndex: func(u types.KubeServer) string {
 				return u.GetHostID() + "/" + u.GetName()
 			},
@@ -81,15 +83,17 @@ func (c *Cache) GetKubernetesServers(ctx context.Context) ([]types.KubeServer, e
 	return out, nil
 }
 
+type kubeClusterStoreIndex string
+
 const kubeClusterStoreNameIndex = "name"
 
-func newKubernetesClusterCollection(k services.Kubernetes, w types.WatchKind) (*collection[types.KubeCluster], error) {
+func newKubernetesClusterCollection(k services.Kubernetes, w types.WatchKind) (*collection[types.KubeCluster, kubeClusterStoreIndex], error) {
 	if k == nil {
 		return nil, trace.BadParameter("missing parameter Kubernetes")
 	}
 
-	return &collection[types.KubeCluster]{
-		store: newStore(map[string]func(types.KubeCluster) string{
+	return &collection[types.KubeCluster, kubeClusterStoreIndex]{
+		store: newStore(map[kubeClusterStoreIndex]func(types.KubeCluster) string{
 			kubeClusterStoreNameIndex: func(u types.KubeCluster) string {
 				return u.GetName()
 			},

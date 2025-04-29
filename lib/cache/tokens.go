@@ -25,15 +25,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const staticTokensStoreNameIndex = "name"
+type staticTokensStoreIndex string
 
-func newStaticTokensCollection(c services.ClusterConfiguration, w types.WatchKind) (*collection[types.StaticTokens], error) {
+const staticTokensStoreNameIndex staticTokensStoreIndex = "name"
+
+func newStaticTokensCollection(c services.ClusterConfiguration, w types.WatchKind) (*collection[types.StaticTokens, staticTokensStoreIndex], error) {
 	if c == nil {
 		return nil, trace.BadParameter("missing parameter ClusterConfig")
 	}
 
-	return &collection[types.StaticTokens]{
-		store: newStore(map[string]func(types.StaticTokens) string{
+	return &collection[types.StaticTokens, staticTokensStoreIndex]{
+		store: newStore(map[staticTokensStoreIndex]func(types.StaticTokens) string{
 			staticTokensStoreNameIndex: func(u types.StaticTokens) string {
 				return u.GetName()
 			},
@@ -78,16 +80,18 @@ func (c *Cache) GetStaticTokens() (types.StaticTokens, error) {
 	return st, trace.Wrap(err)
 }
 
-const provisionTokenStoreNameIndex = "name"
+type provisionTokenStoreIndex string
 
-func newProvisionTokensCollection(p services.Provisioner, w types.WatchKind) (*collection[types.ProvisionToken], error) {
+const provisionTokenStoreNameIndex provisionTokenStoreIndex = "name"
+
+func newProvisionTokensCollection(p services.Provisioner, w types.WatchKind) (*collection[types.ProvisionToken, provisionTokenStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Provisioner")
 	}
 
-	return &collection[types.ProvisionToken]{
-		store: newStore(map[string]func(types.ProvisionToken) string{
-			staticTokensStoreNameIndex: func(u types.ProvisionToken) string {
+	return &collection[types.ProvisionToken, provisionTokenStoreIndex]{
+		store: newStore(map[provisionTokenStoreIndex]func(types.ProvisionToken) string{
+			provisionTokenStoreNameIndex: func(u types.ProvisionToken) string {
 				return u.GetName()
 			},
 		}),

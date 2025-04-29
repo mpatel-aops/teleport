@@ -26,15 +26,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const reverseTunnelStoreNameIndex = "name"
+type reverseTunnelStoreIndex string
 
-func newReverseTunnelCollection(upstream services.Presence, w types.WatchKind) (*collection[types.ReverseTunnel], error) {
+const reverseTunnelStoreNameIndex reverseTunnelStoreIndex = "name"
+
+func newReverseTunnelCollection(upstream services.Presence, w types.WatchKind) (*collection[types.ReverseTunnel, reverseTunnelStoreIndex], error) {
 	if upstream == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.ReverseTunnel]{
-		store: newStore(map[string]func(types.ReverseTunnel) string{
+	return &collection[types.ReverseTunnel, reverseTunnelStoreIndex]{
+		store: newStore(map[reverseTunnelStoreIndex]func(types.ReverseTunnel) string{
 			reverseTunnelStoreNameIndex: func(r types.ReverseTunnel) string {
 				return r.GetName()
 			},
@@ -76,7 +78,7 @@ func (c *Cache) ListReverseTunnels(ctx context.Context, pageSize int, pageToken 
 	ctx, span := c.Tracer.Start(ctx, "cache/ListReverseTunnels")
 	defer span.End()
 
-	lister := genericLister[types.ReverseTunnel]{
+	lister := genericLister[types.ReverseTunnel, reverseTunnelStoreIndex]{
 		cache:        c,
 		collection:   c.collections.reverseTunnels,
 		index:        reverseTunnelStoreNameIndex,

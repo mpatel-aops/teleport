@@ -26,15 +26,17 @@ import (
 	"github.com/gravitational/teleport/lib/services/local"
 )
 
-const userGroupStoreNameIndex = "name"
+type userGroupStoreIndex string
 
-func newUserGroupCollection(u services.UserGroups, w types.WatchKind) (*collection[types.UserGroup], error) {
+const userGroupStoreNameIndex userGroupStoreIndex = "name"
+
+func newUserGroupCollection(u services.UserGroups, w types.WatchKind) (*collection[types.UserGroup, userGroupStoreIndex], error) {
 	if u == nil {
 		return nil, trace.BadParameter("missing parameter UserGroups")
 	}
 
-	return &collection[types.UserGroup]{
-		store: newStore(map[string]func(types.UserGroup) string{
+	return &collection[types.UserGroup, userGroupStoreIndex]{
+		store: newStore(map[userGroupStoreIndex]func(types.UserGroup) string{
 			userGroupStoreNameIndex: func(r types.UserGroup) string {
 				return r.GetName()
 			},

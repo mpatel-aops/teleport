@@ -576,15 +576,15 @@ func readLegacyCollectionCache[R any](cache *Cache, collection collectionReader[
 
 // acquireReadGuard provides a readGuard that may be used to determine how
 // a cache read should operate. The returned guard *must* be released to prevent deadlocks.
-func acquireReadGuard[T any](cache *Cache, c *collection[T]) (readGuard[T], error) {
+func acquireReadGuard[T any, I ~string](cache *Cache, c *collection[T, I]) (readGuard[T, I], error) {
 	if cache.closed.Load() {
-		return readGuard[T]{}, trace.Errorf("cache is closed")
+		return readGuard[T, I]{}, trace.Errorf("cache is closed")
 	}
 	cache.rw.RLock()
 
 	if cache.ok {
 		if _, kindOK := cache.confirmedKinds[resourceKind{kind: c.watch.Kind, subkind: c.watch.SubKind}]; kindOK {
-			return readGuard[T]{
+			return readGuard[T, I]{
 				cacheRead: true,
 				release:   cache.rw.RUnlock,
 				store:     c.store,
@@ -593,7 +593,7 @@ func acquireReadGuard[T any](cache *Cache, c *collection[T]) (readGuard[T], erro
 	}
 
 	cache.rw.RUnlock()
-	return readGuard[T]{
+	return readGuard[T, I]{
 		cacheRead: false,
 	}, nil
 }
@@ -647,20 +647,20 @@ func (r *legacyReadGuard[R]) IsCacheRead() bool {
 	return r.release != nil
 }
 
-type readGuard[T any] struct {
+type readGuard[T any, I ~string] struct {
 	cacheRead bool
-	store     *store[T]
+	store     *store[T, I]
 	once      sync.Once
 	release   func()
 }
 
-func (r *readGuard[T]) ReadCache() bool {
+func (r *readGuard[T, I]) ReadCache() bool {
 	return r.cacheRead
 }
 
 // Release releases the read lock if it is held.  This method
 // can be called multiple times.
-func (r *readGuard[T]) Release() {
+func (r *readGuard[T, I]) Release() {
 	r.once.Do(func() {
 		if r.release == nil {
 			return

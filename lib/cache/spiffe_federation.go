@@ -29,15 +29,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const spiffeFederationStoreNameIndex = "name"
+type spiffeFederationIndex string
 
-func newSPIFFEFederationCollection(upstream services.SPIFFEFederations, w types.WatchKind) (*collection[*machineidv1.SPIFFEFederation], error) {
+const spiffeFederationStoreNameIndex spiffeFederationIndex = "name"
+
+func newSPIFFEFederationCollection(upstream services.SPIFFEFederations, w types.WatchKind) (*collection[*machineidv1.SPIFFEFederation, spiffeFederationIndex], error) {
 	if upstream == nil {
 		return nil, trace.BadParameter("missing parameter SPIFFEFederations")
 	}
 
-	return &collection[*machineidv1.SPIFFEFederation]{
-		store: newStore(map[string]func(*machineidv1.SPIFFEFederation) string{
+	return &collection[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
+		store: newStore(map[spiffeFederationIndex]func(*machineidv1.SPIFFEFederation) string{
 			spiffeFederationStoreNameIndex: func(r *machineidv1.SPIFFEFederation) string {
 				return r.GetMetadata().GetName()
 			},
@@ -78,7 +80,7 @@ func (c *Cache) ListSPIFFEFederations(ctx context.Context, pageSize int, nextTok
 	ctx, span := c.Tracer.Start(ctx, "cache/ListSPIFFEFederations")
 	defer span.End()
 
-	lister := genericLister[*machineidv1.SPIFFEFederation]{
+	lister := genericLister[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
 		cache:        c,
 		collection:   c.collections.spiffeFederations,
 		index:        spiffeFederationStoreNameIndex,
@@ -97,7 +99,7 @@ func (c *Cache) GetSPIFFEFederation(ctx context.Context, name string) (*machinei
 	ctx, span := c.Tracer.Start(ctx, "cache/GetSPIFFEFederation")
 	defer span.End()
 
-	getter := genericGetter[*machineidv1.SPIFFEFederation]{
+	getter := genericGetter[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
 		cache:       c,
 		collection:  c.collections.spiffeFederations,
 		index:       spiffeFederationStoreNameIndex,

@@ -31,15 +31,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const healthCheckConfigStoreNameIndex = "name"
+type healthCheckConfigStoreIndex string
 
-func newHealthCheckConfigCollection(upstream services.HealthCheckConfigReader, w types.WatchKind) (*collection[*healthcheckconfigv1.HealthCheckConfig], error) {
+const healthCheckConfigStoreNameIndex healthCheckConfigStoreIndex = "name"
+
+func newHealthCheckConfigCollection(upstream services.HealthCheckConfigReader, w types.WatchKind) (*collection[*healthcheckconfigv1.HealthCheckConfig, healthCheckConfigStoreIndex], error) {
 	if upstream == nil {
 		return nil, trace.BadParameter("missing parameter HealthCheckConfigReader")
 	}
 
-	return &collection[*healthcheckconfigv1.HealthCheckConfig]{
-		store: newStore(map[string]func(*healthcheckconfigv1.HealthCheckConfig) string{
+	return &collection[*healthcheckconfigv1.HealthCheckConfig, healthCheckConfigStoreIndex]{
+		store: newStore(map[healthCheckConfigStoreIndex]func(*healthcheckconfigv1.HealthCheckConfig) string{
 			healthCheckConfigStoreNameIndex: func(r *healthcheckconfigv1.HealthCheckConfig) string {
 				return r.GetMetadata().GetName()
 			},
@@ -73,7 +75,7 @@ func (c *Cache) ListHealthCheckConfigs(ctx context.Context, pageSize int, nextTo
 	ctx, span := c.Tracer.Start(ctx, "cache/ListHealthCheckConfigs")
 	defer span.End()
 
-	lister := genericLister[*healthcheckconfigv1.HealthCheckConfig]{
+	lister := genericLister[*healthcheckconfigv1.HealthCheckConfig, healthCheckConfigStoreIndex]{
 		cache:           c,
 		collection:      c.collections.healthCheckConfig,
 		index:           healthCheckConfigStoreNameIndex,
@@ -96,7 +98,7 @@ func (c *Cache) GetHealthCheckConfig(ctx context.Context, name string) (*healthc
 	ctx, span := c.Tracer.Start(ctx, "cache/GetHealthCheckConfig")
 	defer span.End()
 
-	getter := genericGetter[*healthcheckconfigv1.HealthCheckConfig]{
+	getter := genericGetter[*healthcheckconfigv1.HealthCheckConfig, healthCheckConfigStoreIndex]{
 		cache:       c,
 		collection:  c.collections.healthCheckConfig,
 		index:       healthCheckConfigStoreNameIndex,

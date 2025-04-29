@@ -25,15 +25,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const roleStoreNameIndex = "name"
+type roleStoreIndex string
 
-func newRoleCollection(a services.Access, w types.WatchKind) (*collection[types.Role], error) {
+const roleStoreNameIndex roleStoreIndex = "name"
+
+func newRoleCollection(a services.Access, w types.WatchKind) (*collection[types.Role, roleStoreIndex], error) {
 	if a == nil {
 		return nil, trace.BadParameter("missing parameter Access")
 	}
 
-	return &collection[types.Role]{
-		store: newStore(map[string]func(types.Role) string{
+	return &collection[types.Role, roleStoreIndex]{
+		store: newStore(map[roleStoreIndex]func(types.Role) string{
 			roleStoreNameIndex: func(r types.Role) string {
 				return r.GetName()
 			},

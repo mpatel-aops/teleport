@@ -29,15 +29,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const workloadIdentityStoreNameIndex = "name"
+type workloadIdentityStoreIndex string
 
-func newWorkloadIdentityCollection(upstream services.WorkloadIdentities, w types.WatchKind) (*collection[*workloadidentityv1pb.WorkloadIdentity], error) {
+const workloadIdentityStoreNameIndex workloadIdentityStoreIndex = "name"
+
+func newWorkloadIdentityCollection(upstream services.WorkloadIdentities, w types.WatchKind) (*collection[*workloadidentityv1pb.WorkloadIdentity, workloadIdentityStoreIndex], error) {
 	if upstream == nil {
 		return nil, trace.BadParameter("missing parameter WorkloadIdentities")
 	}
 
-	return &collection[*workloadidentityv1pb.WorkloadIdentity]{
-		store: newStore(map[string]func(*workloadidentityv1pb.WorkloadIdentity) string{
+	return &collection[*workloadidentityv1pb.WorkloadIdentity, workloadIdentityStoreIndex]{
+		store: newStore(map[workloadIdentityStoreIndex]func(*workloadidentityv1pb.WorkloadIdentity) string{
 			workloadIdentityStoreNameIndex: func(r *workloadidentityv1pb.WorkloadIdentity) string {
 				return r.GetMetadata().GetName()
 			},
@@ -79,7 +81,7 @@ func (c *Cache) ListWorkloadIdentities(ctx context.Context, pageSize int, nextTo
 	ctx, span := c.Tracer.Start(ctx, "cache/ListWorkloadIdentities")
 	defer span.End()
 
-	lister := genericLister[*workloadidentityv1pb.WorkloadIdentity]{
+	lister := genericLister[*workloadidentityv1pb.WorkloadIdentity, workloadIdentityStoreIndex]{
 		cache:        c,
 		collection:   c.collections.workloadIdentity,
 		index:        workloadIdentityStoreNameIndex,
@@ -98,7 +100,7 @@ func (c *Cache) GetWorkloadIdentity(ctx context.Context, name string) (*workload
 	ctx, span := c.Tracer.Start(ctx, "cache/GetWorkloadIdentity")
 	defer span.End()
 
-	getter := genericGetter[*workloadidentityv1pb.WorkloadIdentity]{
+	getter := genericGetter[*workloadidentityv1pb.WorkloadIdentity, workloadIdentityStoreIndex]{
 		cache:       c,
 		collection:  c.collections.workloadIdentity,
 		index:       workloadIdentityStoreNameIndex,

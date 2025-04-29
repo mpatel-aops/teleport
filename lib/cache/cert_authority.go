@@ -27,9 +27,11 @@ import (
 	"github.com/gravitational/teleport/lib/utils/sortcache"
 )
 
-const certAuthorityStoreIDIndex = "id"
+type certAuthorityStoreIndex string
 
-func newCertAuthorityCollection(t services.Trust, w types.WatchKind) (*collection[types.CertAuthority], error) {
+const certAuthorityStoreIDIndex certAuthorityStoreIndex = "id"
+
+func newCertAuthorityCollection(t services.Trust, w types.WatchKind) (*collection[types.CertAuthority, certAuthorityStoreIndex], error) {
 	if t == nil {
 		return nil, trace.BadParameter("missing parameter Trust")
 	}
@@ -37,8 +39,8 @@ func newCertAuthorityCollection(t services.Trust, w types.WatchKind) (*collectio
 	var filter types.CertAuthorityFilter
 	filter.FromMap(w.Filter)
 
-	return &collection[types.CertAuthority]{
-		store: newStore(map[string]func(types.CertAuthority) string{
+	return &collection[types.CertAuthority, certAuthorityStoreIndex]{
+		store: newStore(map[certAuthorityStoreIndex]func(types.CertAuthority) string{
 			certAuthorityStoreIDIndex: func(ca types.CertAuthority) string {
 				return string(ca.GetType()) + "/" + ca.GetID().DomainName
 			},

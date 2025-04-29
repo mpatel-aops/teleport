@@ -27,15 +27,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const windowsDesktopServiceStoreNameIndex = "name"
+type windowsDesktopServiceStoreIndex string
 
-func newWindowsDesktopServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.WindowsDesktopService], error) {
+const windowsDesktopServiceStoreNameIndex windowsDesktopServiceStoreIndex = "name"
+
+func newWindowsDesktopServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.WindowsDesktopService, windowsDesktopServiceStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.WindowsDesktopService]{
-		store: newStore(map[string]func(types.WindowsDesktopService) string{
+	return &collection[types.WindowsDesktopService, windowsDesktopServiceStoreIndex]{
+		store: newStore(map[windowsDesktopServiceStoreIndex]func(types.WindowsDesktopService) string{
 			windowsDesktopServiceStoreNameIndex: func(u types.WindowsDesktopService) string {
 				return u.GetName()
 			},
@@ -155,15 +157,17 @@ func (c *Cache) ListWindowsDesktopServices(ctx context.Context, req types.ListWi
 	return &resp, nil
 }
 
-const windowsDesktopStoreNameIndex = "name"
+type windowsDesktopStoreIndex string
 
-func newWindowsDesktopCollection(d services.WindowsDesktops, w types.WatchKind) (*collection[types.WindowsDesktop], error) {
+const windowsDesktopStoreNameIndex windowsDesktopStoreIndex = "name"
+
+func newWindowsDesktopCollection(d services.WindowsDesktops, w types.WatchKind) (*collection[types.WindowsDesktop, windowsDesktopStoreIndex], error) {
 	if d == nil {
 		return nil, trace.BadParameter("missing parameter Apps")
 	}
 
-	return &collection[types.WindowsDesktop]{
-		store: newStore(map[string]func(types.WindowsDesktop) string{
+	return &collection[types.WindowsDesktop, windowsDesktopStoreIndex]{
+		store: newStore(map[windowsDesktopStoreIndex]func(types.WindowsDesktop) string{
 			windowsDesktopStoreNameIndex: func(u types.WindowsDesktop) string {
 				return u.GetHostID() + "/" + u.GetName()
 			},

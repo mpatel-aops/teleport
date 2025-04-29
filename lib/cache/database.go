@@ -28,15 +28,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
+type databaseStoreIndex string
+
 const databaseStoreNameIndex = "name"
 
-func newDatabaseCollection(p services.Databases, w types.WatchKind) (*collection[types.Database], error) {
+func newDatabaseCollection(p services.Databases, w types.WatchKind) (*collection[types.Database, databaseStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Databases")
 	}
 
-	return &collection[types.Database]{
-		store: newStore(map[string]func(types.Database) string{
+	return &collection[types.Database, databaseStoreIndex]{
+		store: newStore(map[databaseStoreIndex]func(types.Database) string{
 			databaseStoreNameIndex: func(u types.Database) string {
 				return u.GetName()
 			},
@@ -105,15 +107,17 @@ func (c *Cache) GetDatabases(ctx context.Context) ([]types.Database, error) {
 	return out, nil
 }
 
-const databaseServerStoreNameIndex = "name"
+type databaseServerStoreIndex string
 
-func newDatabaseServerCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseServer], error) {
+const databaseServerStoreNameIndex databaseServerStoreIndex = "name"
+
+func newDatabaseServerCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseServer, databaseServerStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.DatabaseServer]{
-		store: newStore(map[string]func(types.DatabaseServer) string{
+	return &collection[types.DatabaseServer, databaseServerStoreIndex]{
+		store: newStore(map[databaseServerStoreIndex]func(types.DatabaseServer) string{
 			databaseServerStoreNameIndex: func(u types.DatabaseServer) string {
 				return u.GetHostID() + "/" + u.GetName()
 			},
@@ -161,15 +165,17 @@ func (c *Cache) GetDatabaseServers(ctx context.Context, namespace string, opts .
 	return out, nil
 }
 
-const databaseServiceStoreNameIndex = "name"
+type databaseServiceStoreIndex string
 
-func newDatabaseServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseService], error) {
+const databaseServiceStoreNameIndex databaseServiceStoreIndex = "name"
+
+func newDatabaseServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseService, databaseServiceStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Databases")
 	}
 
-	return &collection[types.DatabaseService]{
-		store: newStore(map[string]func(types.DatabaseService) string{
+	return &collection[types.DatabaseService, databaseServiceStoreIndex]{
+		store: newStore(map[databaseServiceStoreIndex]func(types.DatabaseService) string{
 			databaseServiceStoreNameIndex: func(u types.DatabaseService) string {
 				return u.GetName()
 			},

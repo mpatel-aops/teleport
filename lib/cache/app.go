@@ -26,15 +26,17 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-const appStoreNameIndex = "name"
+type appStoreIndex string
 
-func newAppCollection(p services.Apps, w types.WatchKind) (*collection[types.Application], error) {
+const appStoreNameIndex appStoreIndex = "name"
+
+func newAppCollection(p services.Apps, w types.WatchKind) (*collection[types.Application, appStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Apps")
 	}
 
-	return &collection[types.Application]{
-		store: newStore(map[string]func(types.Application) string{
+	return &collection[types.Application, appStoreIndex]{
+		store: newStore(map[appStoreIndex]func(types.Application) string{
 			appStoreNameIndex: func(u types.Application) string {
 				return u.GetName()
 			},
@@ -103,15 +105,17 @@ func (c *Cache) GetApp(ctx context.Context, name string) (types.Application, err
 	return a.Copy(), nil
 }
 
-const appServerStoreNameIndex = "name"
+type appServerStoreIndex string
 
-func newAppServerCollection(p services.Presence, w types.WatchKind) (*collection[types.AppServer], error) {
+const appServerStoreNameIndex appServerStoreIndex = "name"
+
+func newAppServerCollection(p services.Presence, w types.WatchKind) (*collection[types.AppServer, appServerStoreIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.AppServer]{
-		store: newStore(map[string]func(types.AppServer) string{
+	return &collection[types.AppServer, appServerStoreIndex]{
+		store: newStore(map[appServerStoreIndex]func(types.AppServer) string{
 			appServerStoreNameIndex: func(u types.AppServer) string {
 				return u.GetHostID() + "/" + u.GetName()
 			},
