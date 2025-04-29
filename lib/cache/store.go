@@ -89,3 +89,13 @@ func (s *store[T]) get(index, key string) (T, error) {
 func (s *store[T]) resources(index, start, stop string) iter.Seq[T] {
 	return s.cache.Ascend(index, start, stop)
 }
+
+// count returns the number of items that exist in the provided range.
+func (s *store[T]) count(index, start, stop string) int {
+	var n int
+	for range s.cache.Ascend(index, start, stop) {
+		n++
+	}
+
+	return n
+}
