@@ -26,6 +26,7 @@ import (
 	machineidv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/machineid/v1"
 	workloadidentityv1 "github.com/gravitational/teleport/api/gen/proto/go/teleport/workloadidentity/v1"
 	"github.com/gravitational/teleport/api/types"
+	"github.com/gravitational/teleport/api/types/secreports"
 )
 
 // collectionHandler is used by the [Cache] to seed the initial
@@ -75,6 +76,9 @@ type collections struct {
 	reverseTunnels                   *collection[types.ReverseTunnel]
 	spiffeFederations                *collection[*machineidv1.SPIFFEFederation]
 	workloadIdentity                 *collection[*workloadidentityv1.WorkloadIdentity]
+	auditQueries                     *collection[*secreports.AuditQuery]
+	secReports                       *collection[*secreports.Report]
+	secReportsStates                 *collection[*secreports.ReportState]
 }
 
 // setupCollections ensures that the appropriate [collection] is
@@ -273,6 +277,30 @@ func setupCollections(c Config) (*collections, error) {
 
 			out.workloadIdentity = collect
 			out.byKind[resourceKind] = out.workloadIdentity
+		case types.KindAuditQuery:
+			collect, err := newAuditQueryCollection(c.SecReports, watch)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+			out.auditQueries = collect
+			out.byKind[resourceKind] = out.auditQueries
+		case types.KindSecurityReport:
+			collect, err := newSecurityReportCollection(c.SecReports, watch)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+			out.secReports = collect
+			out.byKind[resourceKind] = out.secReports
+		case types.KindSecurityReportState:
+			collect, err := newSecurityReportStateCollection(c.SecReports, watch)
+			if err != nil {
+				return nil, trace.Wrap(err)
+			}
+
+			out.secReportsStates = collect
+			out.byKind[resourceKind] = out.secReportsStates
 		}
 	}
 
