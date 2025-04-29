@@ -25,18 +25,18 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-type staticTokensStoreIndex string
+type staticTokensIndex string
 
-const staticTokensStoreNameIndex staticTokensStoreIndex = "name"
+const staticTokensNameIndex staticTokensIndex = "name"
 
-func newStaticTokensCollection(c services.ClusterConfiguration, w types.WatchKind) (*collection[types.StaticTokens, staticTokensStoreIndex], error) {
+func newStaticTokensCollection(c services.ClusterConfiguration, w types.WatchKind) (*collection[types.StaticTokens, staticTokensIndex], error) {
 	if c == nil {
 		return nil, trace.BadParameter("missing parameter ClusterConfig")
 	}
 
-	return &collection[types.StaticTokens, staticTokensStoreIndex]{
-		store: newStore(map[staticTokensStoreIndex]func(types.StaticTokens) string{
-			staticTokensStoreNameIndex: func(u types.StaticTokens) string {
+	return &collection[types.StaticTokens, staticTokensIndex]{
+		store: newStore(map[staticTokensIndex]func(types.StaticTokens) string{
+			staticTokensNameIndex: func(u types.StaticTokens) string {
 				return u.GetName()
 			},
 		}),
@@ -72,7 +72,7 @@ func (c *Cache) GetStaticTokens() (types.StaticTokens, error) {
 	defer rg.Release()
 
 	if rg.ReadCache() {
-		st, err := rg.store.get(staticTokensStoreNameIndex, types.MetaNameStaticTokens)
+		st, err := rg.store.get(staticTokensNameIndex, types.MetaNameStaticTokens)
 		return st.Clone(), trace.Wrap(err)
 	}
 
@@ -80,17 +80,17 @@ func (c *Cache) GetStaticTokens() (types.StaticTokens, error) {
 	return st, trace.Wrap(err)
 }
 
-type provisionTokenStoreIndex string
+type provisionTokenIndex string
 
-const provisionTokenStoreNameIndex provisionTokenStoreIndex = "name"
+const provisionTokenStoreNameIndex provisionTokenIndex = "name"
 
-func newProvisionTokensCollection(p services.Provisioner, w types.WatchKind) (*collection[types.ProvisionToken, provisionTokenStoreIndex], error) {
+func newProvisionTokensCollection(p services.Provisioner, w types.WatchKind) (*collection[types.ProvisionToken, provisionTokenIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Provisioner")
 	}
 
-	return &collection[types.ProvisionToken, provisionTokenStoreIndex]{
-		store: newStore(map[provisionTokenStoreIndex]func(types.ProvisionToken) string{
+	return &collection[types.ProvisionToken, provisionTokenIndex]{
+		store: newStore(map[provisionTokenIndex]func(types.ProvisionToken) string{
 			provisionTokenStoreNameIndex: func(u types.ProvisionToken) string {
 				return u.GetName()
 			},

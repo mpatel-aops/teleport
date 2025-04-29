@@ -24,18 +24,18 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-type authServerStoreIndex string
+type authServerIndex string
 
-const authServerStoreNameIndex authServerStoreIndex = "name"
+const authServerNameIndex authServerIndex = "name"
 
-func newAuthServerCollection(p services.Presence, w types.WatchKind) (*collection[types.Server, authServerStoreIndex], error) {
+func newAuthServerCollection(p services.Presence, w types.WatchKind) (*collection[types.Server, authServerIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.Server, authServerStoreIndex]{
-		store: newStore(map[authServerStoreIndex]func(types.Server) string{
-			authServerStoreNameIndex: func(u types.Server) string {
+	return &collection[types.Server, authServerIndex]{
+		store: newStore(map[authServerIndex]func(types.Server) string{
+			authServerNameIndex: func(u types.Server) string {
 				return u.GetName()
 			},
 		}),
@@ -73,7 +73,7 @@ func (c *Cache) GetAuthServers() ([]types.Server, error) {
 	}
 
 	servers := make([]types.Server, 0, rg.store.len())
-	for s := range rg.store.resources(authServerStoreNameIndex, "", "") {
+	for s := range rg.store.resources(authServerNameIndex, "", "") {
 		servers = append(servers, s.DeepCopy())
 	}
 

@@ -2891,7 +2891,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 	switch req.ResourceType {
 	case types.KindDatabaseServer:
 		resp, err := buildListResourcesResponse(
-			c.collections.dbServers.store.resources(databaseServerStoreNameIndex, req.StartKey, ""),
+			c.collections.dbServers.store.resources(databaseServerNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			types.DatabaseServer.CloneResource,
@@ -2899,7 +2899,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindDatabaseService:
 		resp, err := buildListResourcesResponse(
-			c.collections.dbServices.store.resources(databaseServiceStoreNameIndex, req.StartKey, ""),
+			c.collections.dbServices.store.resources(databaseServiceNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			func(d types.DatabaseService) types.ResourceWithLabels {
@@ -2909,7 +2909,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindAppServer:
 		resp, err := buildListResourcesResponse(
-			c.collections.appServers.store.resources(appServerStoreNameIndex, req.StartKey, ""),
+			c.collections.appServers.store.resources(appServerNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			types.AppServer.CloneResource,
@@ -2917,7 +2917,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindNode:
 		resp, err := buildListResourcesResponse(
-			c.collections.nodes.store.resources(nodeStoreNameIndex, req.StartKey, ""),
+			c.collections.nodes.store.resources(nodeNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			types.Server.CloneResource,
@@ -2925,7 +2925,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindWindowsDesktopService:
 		resp, err := buildListResourcesResponse(
-			c.collections.windowsDesktopServices.store.resources(windowsDesktopServiceStoreNameIndex, req.StartKey, ""),
+			c.collections.windowsDesktopServices.store.resources(windowsDesktopServiceNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			func(d types.WindowsDesktopService) types.ResourceWithLabels {
@@ -2935,7 +2935,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindKubeServer:
 		resp, err := buildListResourcesResponse(
-			c.collections.kubeServers.store.resources(kubeServerStoreNameIndex, req.StartKey, ""),
+			c.collections.kubeServers.store.resources(kubeServerNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			types.KubeServer.CloneResource,
@@ -2943,7 +2943,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 		return resp, trace.Wrap(err)
 	case types.KindUserGroup:
 		resp, err := buildListResourcesResponse(
-			c.collections.userGroups.store.resources(userGroupStoreNameIndex, req.StartKey, ""),
+			c.collections.userGroups.store.resources(userGroupNameIndex, req.StartKey, ""),
 			limit,
 			filter,
 			func(g types.UserGroup) types.ResourceWithLabels {
@@ -2954,7 +2954,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 	case types.KindIdentityCenterAccount:
 		resp, err := buildListResourcesResponse(
 			func(yield func(types.ResourceWithLabels) bool) {
-				for account := range c.collections.identityCenterAccounts.store.resources(identityCenterAccountStoreNameIndex, req.StartKey, "") {
+				for account := range c.collections.identityCenterAccounts.store.resources(identityCenterAccountNameIndex, req.StartKey, "") {
 					if !yield(types.Resource153ToResourceWithLabels(account)) {
 						return
 					}
@@ -2973,7 +2973,7 @@ func (c *Cache) listResources(ctx context.Context, req proto.ListResourcesReques
 	case types.KindIdentityCenterAccountAssignment:
 		resp, err := buildListResourcesResponse(
 			func(yield func(types.ResourceWithLabels) bool) {
-				for assignment := range c.collections.identityCenterAccountAssignments.store.resources(identityCenterAccountAssignmentStoreNameIndex, req.StartKey, "") {
+				for assignment := range c.collections.identityCenterAccountAssignments.store.resources(identityCenterAccountAssignmentNameIndex, req.StartKey, "") {
 					if !yield(types.Resource153ToResourceWithLabels(assignment)) {
 						return
 					}

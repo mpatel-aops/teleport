@@ -28,18 +28,18 @@ import (
 	"github.com/gravitational/teleport/lib/services"
 )
 
-type databaseStoreIndex string
+type databaseIndex string
 
-const databaseStoreNameIndex = "name"
+const databaseNameIndex = "name"
 
-func newDatabaseCollection(p services.Databases, w types.WatchKind) (*collection[types.Database, databaseStoreIndex], error) {
+func newDatabaseCollection(p services.Databases, w types.WatchKind) (*collection[types.Database, databaseIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Databases")
 	}
 
-	return &collection[types.Database, databaseStoreIndex]{
-		store: newStore(map[databaseStoreIndex]func(types.Database) string{
-			databaseStoreNameIndex: func(u types.Database) string {
+	return &collection[types.Database, databaseIndex]{
+		store: newStore(map[databaseIndex]func(types.Database) string{
+			databaseNameIndex: func(u types.Database) string {
 				return u.GetName()
 			},
 		}),
@@ -75,7 +75,7 @@ func (c *Cache) GetDatabase(ctx context.Context, name string) (types.Database, e
 		return dbs, trace.Wrap(err)
 	}
 
-	d, err := rg.store.get(databaseStoreNameIndex, name)
+	d, err := rg.store.get(databaseNameIndex, name)
 	if err != nil {
 		return nil, trace.Wrap(err)
 	}
@@ -100,25 +100,25 @@ func (c *Cache) GetDatabases(ctx context.Context) ([]types.Database, error) {
 	}
 
 	out := make([]types.Database, 0, rg.store.len())
-	for d := range rg.store.resources(databaseStoreNameIndex, "", "") {
+	for d := range rg.store.resources(databaseNameIndex, "", "") {
 		out = append(out, d.Copy())
 	}
 
 	return out, nil
 }
 
-type databaseServerStoreIndex string
+type databaseServerIndex string
 
-const databaseServerStoreNameIndex databaseServerStoreIndex = "name"
+const databaseServerNameIndex databaseServerIndex = "name"
 
-func newDatabaseServerCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseServer, databaseServerStoreIndex], error) {
+func newDatabaseServerCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseServer, databaseServerIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Presence")
 	}
 
-	return &collection[types.DatabaseServer, databaseServerStoreIndex]{
-		store: newStore(map[databaseServerStoreIndex]func(types.DatabaseServer) string{
-			databaseServerStoreNameIndex: func(u types.DatabaseServer) string {
+	return &collection[types.DatabaseServer, databaseServerIndex]{
+		store: newStore(map[databaseServerIndex]func(types.DatabaseServer) string{
+			databaseServerNameIndex: func(u types.DatabaseServer) string {
 				return u.GetHostID() + "/" + u.GetName()
 			},
 		}),
@@ -158,25 +158,25 @@ func (c *Cache) GetDatabaseServers(ctx context.Context, namespace string, opts .
 	}
 
 	out := make([]types.DatabaseServer, 0, rg.store.len())
-	for ds := range rg.store.resources(databaseServerStoreNameIndex, "", "") {
+	for ds := range rg.store.resources(databaseServerNameIndex, "", "") {
 		out = append(out, ds.Copy())
 	}
 
 	return out, nil
 }
 
-type databaseServiceStoreIndex string
+type databaseServiceIndex string
 
-const databaseServiceStoreNameIndex databaseServiceStoreIndex = "name"
+const databaseServiceNameIndex databaseServiceIndex = "name"
 
-func newDatabaseServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseService, databaseServiceStoreIndex], error) {
+func newDatabaseServiceCollection(p services.Presence, w types.WatchKind) (*collection[types.DatabaseService, databaseServiceIndex], error) {
 	if p == nil {
 		return nil, trace.BadParameter("missing parameter Databases")
 	}
 
-	return &collection[types.DatabaseService, databaseServiceStoreIndex]{
-		store: newStore(map[databaseServiceStoreIndex]func(types.DatabaseService) string{
-			databaseServiceStoreNameIndex: func(u types.DatabaseService) string {
+	return &collection[types.DatabaseService, databaseServiceIndex]{
+		store: newStore(map[databaseServiceIndex]func(types.DatabaseService) string{
+			databaseServiceNameIndex: func(u types.DatabaseService) string {
 				return u.GetName()
 			},
 		}),

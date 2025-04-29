@@ -31,7 +31,7 @@ import (
 
 type spiffeFederationIndex string
 
-const spiffeFederationStoreNameIndex spiffeFederationIndex = "name"
+const spiffeFederationNameIndex spiffeFederationIndex = "name"
 
 func newSPIFFEFederationCollection(upstream services.SPIFFEFederations, w types.WatchKind) (*collection[*machineidv1.SPIFFEFederation, spiffeFederationIndex], error) {
 	if upstream == nil {
@@ -40,7 +40,7 @@ func newSPIFFEFederationCollection(upstream services.SPIFFEFederations, w types.
 
 	return &collection[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
 		store: newStore(map[spiffeFederationIndex]func(*machineidv1.SPIFFEFederation) string{
-			spiffeFederationStoreNameIndex: func(r *machineidv1.SPIFFEFederation) string {
+			spiffeFederationNameIndex: func(r *machineidv1.SPIFFEFederation) string {
 				return r.GetMetadata().GetName()
 			},
 		}),
@@ -83,7 +83,7 @@ func (c *Cache) ListSPIFFEFederations(ctx context.Context, pageSize int, nextTok
 	lister := genericLister[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
 		cache:        c,
 		collection:   c.collections.spiffeFederations,
-		index:        spiffeFederationStoreNameIndex,
+		index:        spiffeFederationNameIndex,
 		upstreamList: c.Config.SPIFFEFederations.ListSPIFFEFederations,
 		nextToken: func(t *machineidv1.SPIFFEFederation) string {
 			return t.GetMetadata().GetName()
@@ -102,7 +102,7 @@ func (c *Cache) GetSPIFFEFederation(ctx context.Context, name string) (*machinei
 	getter := genericGetter[*machineidv1.SPIFFEFederation, spiffeFederationIndex]{
 		cache:       c,
 		collection:  c.collections.spiffeFederations,
-		index:       spiffeFederationStoreNameIndex,
+		index:       spiffeFederationNameIndex,
 		upstreamGet: c.Config.SPIFFEFederations.GetSPIFFEFederation,
 		clone:       utils.CloneProtoMsg[*machineidv1.SPIFFEFederation],
 	}
