@@ -128,7 +128,7 @@
             "verbs": [
               "*"
             ],
-            "group": "*"
+            "api_group": "*"
           }
         ],
         "gcp_service_accounts": [

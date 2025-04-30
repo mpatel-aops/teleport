@@ -270,8 +270,8 @@ spec:
                       Role grants access to.
                     items:
                       properties:
-                        group:
-                          description: Group specifies the API group of the resource.
+                        api_group:
+                          description: APIGroup specifies the API group of the resource.
                             Can be '*' for any, but doesn't support pattern matching.
                           type: string
                         kind:
@@ -283,6 +283,9 @@ spec:
                         namespace:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
+                          type: string
+                        sub_resource:
+                          description: For future use.
                           type: string
                         verbs:
                           description: Verbs are the allowed Kubernetes verbs for
@@ -862,8 +865,8 @@ spec:
                       Role grants access to.
                     items:
                       properties:
-                        group:
-                          description: Group specifies the API group of the resource.
+                        api_group:
+                          description: APIGroup specifies the API group of the resource.
                             Can be '*' for any, but doesn't support pattern matching.
                           type: string
                         kind:
@@ -875,6 +878,9 @@ spec:
                         namespace:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
+                          type: string
+                        sub_resource:
+                          description: For future use.
                           type: string
                         verbs:
                           description: Verbs are the allowed Kubernetes verbs for
@@ -1751,8 +1757,8 @@ spec:
                       Role grants access to.
                     items:
                       properties:
-                        group:
-                          description: Group specifies the API group of the resource.
+                        api_group:
+                          description: APIGroup specifies the API group of the resource.
                             Can be '*' for any, but doesn't support pattern matching.
                           type: string
                         kind:
@@ -1764,6 +1770,9 @@ spec:
                         namespace:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
+                          type: string
+                        sub_resource:
+                          description: For future use.
                           type: string
                         verbs:
                           description: Verbs are the allowed Kubernetes verbs for
@@ -2343,8 +2352,8 @@ spec:
                       Role grants access to.
                     items:
                       properties:
-                        group:
-                          description: Group specifies the API group of the resource.
+                        api_group:
+                          description: APIGroup specifies the API group of the resource.
                             Can be '*' for any, but doesn't support pattern matching.
                           type: string
                         kind:
@@ -2356,6 +2365,9 @@ spec:
                         namespace:
                           description: Namespace is the resource namespace. It supports
                             wildcards.
+                          type: string
+                        sub_resource:
+                          description: For future use.
                           type: string
                         verbs:
                           description: Verbs are the allowed Kubernetes verbs for
