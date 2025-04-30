@@ -25,7 +25,7 @@ import (
 )
 
 // Config configures a [SortCache].
-type Config[T any, I ~string] struct {
+type Config[T any, I comparable] struct {
 	// Indexes is a map of index name to key constructor, and defines the set of indexes
 	// upon which lookups can be made. Values that overlap in *any* indexes are treated
 	// as unique. A Put operation for a value that matches an existing value on *any* index
@@ -44,7 +44,7 @@ type Config[T any, I ~string] struct {
 // multiple indexes simultaneously. It has an internal read-write lock
 // and is safe for concurrent use, but the supplied configuration must not
 // be modified, and it is generally best to never modify stored resources.
-type SortCache[T any, I ~string] struct {
+type SortCache[T any, I comparable] struct {
 	rw      sync.RWMutex
 	indexes map[I]func(T) string
 	trees   map[I]*btree.BTreeG[entry]
@@ -58,7 +58,7 @@ type entry struct {
 }
 
 // New sets up a new [SortCache] based on the provided configuration.
-func New[T any, I ~string](cfg Config[T, I]) *SortCache[T, I] {
+func New[T any, I comparable](cfg Config[T, I]) *SortCache[T, I] {
 	const (
 		// bTreeDegree of 8 is standard across most of the teleport codebase
 		bTreeDegree = 8

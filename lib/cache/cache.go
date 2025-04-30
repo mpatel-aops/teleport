@@ -576,7 +576,7 @@ func readLegacyCollectionCache[R any](cache *Cache, collection collectionReader[
 
 // acquireReadGuard provides a readGuard that may be used to determine how
 // a cache read should operate. The returned guard *must* be released to prevent deadlocks.
-func acquireReadGuard[T any, I ~string](cache *Cache, c *collection[T, I]) (readGuard[T, I], error) {
+func acquireReadGuard[T any, I comparable](cache *Cache, c *collection[T, I]) (readGuard[T, I], error) {
 	if cache.closed.Load() {
 		return readGuard[T, I]{}, trace.Errorf("cache is closed")
 	}
@@ -647,7 +647,7 @@ func (r *legacyReadGuard[R]) IsCacheRead() bool {
 	return r.release != nil
 }
 
-type readGuard[T any, I ~string] struct {
+type readGuard[T any, I comparable] struct {
 	cacheRead bool
 	store     *store[T, I]
 	once      sync.Once
