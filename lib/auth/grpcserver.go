@@ -2084,12 +2084,12 @@ func maybeDowngradeRoleVersionToV7(role *types.RoleV6, clientVersion *semver.Ver
 	var allowed []types.KubernetesResource
 	for _, elem := range role.Spec.Allow.KubernetesResources {
 		// If group is '*', simply remove it as the behavior in v7 would be the same.
-		if elem.Group == types.Wildcard {
-			elem.Group = ""
+		if elem.APIGroup == types.Wildcard {
+			elem.APIGroup = ""
 		}
 		// If Kind is known in v7 and group is known, remove it.
-		if _, ok := DefaultKnownRBACResources[elem.Group+elem.Kind]; ok {
-			elem.Group = ""
+		if _, ok := DefaultKnownRBACResources[elem.APIGroup+elem.Kind]; ok {
+			elem.APIGroup = ""
 		}
 		// If we have a known kind, keep it.
 		if _, ok := DefaultKnownRBACResources[elem.Kind]; ok {
@@ -2103,14 +2103,14 @@ func maybeDowngradeRoleVersionToV7(role *types.RoleV6, clientVersion *semver.Ver
 	var denied []types.KubernetesResource
 	for _, elem := range role.Spec.Deny.KubernetesResources {
 		// If group is '*', simply remove it as the behavior in v7 would be the same.
-		if elem.Group == types.Wildcard {
-			elem.Group = ""
+		if elem.APIGroup == types.Wildcard {
+			elem.APIGroup = ""
 			denied = append(denied, elem)
 			continue
 		}
 		// If Kind is known in v7 and group is known, remove it.
-		if _, ok := DefaultKnownRBACResources[elem.Group+elem.Kind]; ok {
-			elem.Group = ""
+		if _, ok := DefaultKnownRBACResources[elem.APIGroup+elem.Kind]; ok {
+			elem.APIGroup = ""
 			denied = append(denied, elem)
 			continue
 		}

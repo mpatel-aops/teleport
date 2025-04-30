@@ -517,7 +517,7 @@ func (a *accessChecker) GetKubeResources(cluster types.KubeCluster) (allowed, de
 				Namespace: namespace,
 				Name:      name,
 				// TODO(@creack): Add support for Groups in AccessRequests.
-				Group: types.Wildcard,
+				APIGroup: types.Wildcard,
 			}
 			// matchKubernetesResource checks if the Kubernetes Resource matches the tuple
 			// (kind, namespace, kame) from the allowed/denied list and does not match the resource

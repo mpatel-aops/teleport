@@ -482,7 +482,7 @@ func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []Kuber
 	case V7:
 		v7resources := slices.Clone(resources)
 		for i, r := range v7resources {
-			r.Group = Wildcard
+			r.APIGroup = Wildcard
 			v7resources[i] = r
 		}
 		return v7resources
@@ -498,11 +498,11 @@ func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []Kuber
 			// This check ignores the Kind field because `validateKubeResources` ensures
 			// that for older roles, the Kind field can only be pod.
 		case len(resources) == 1 && resources[0].Name == Wildcard && resources[0].Namespace == Wildcard:
-			return []KubernetesResource{{Kind: Wildcard, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, Group: Wildcard}}
+			return []KubernetesResource{{Kind: Wildcard, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, APIGroup: Wildcard}}
 		default:
 			v6resources := slices.Clone(resources)
 			for i, r := range v6resources {
-				r.Group = Wildcard
+				r.APIGroup = Wildcard
 				v6resources[i] = r
 			}
 
@@ -514,7 +514,7 @@ func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []Kuber
 				if resource == KindKubePod || resource == KindNamespace {
 					continue
 				}
-				v6resources = append(v6resources, KubernetesResource{Kind: resource, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, Group: Wildcard})
+				v6resources = append(v6resources, KubernetesResource{Kind: resource, Name: Wildcard, Namespace: Wildcard, Verbs: []string{Wildcard}, APIGroup: Wildcard})
 			}
 			return v6resources
 		}
@@ -1216,7 +1216,7 @@ func (r *RoleV6) CheckAndSetDefaults() error {
 					Namespace: Wildcard,
 					Name:      Wildcard,
 					Verbs:     []string{Wildcard},
-					Group:     Wildcard,
+					APIGroup:  Wildcard,
 				},
 			}
 		}
@@ -1915,14 +1915,14 @@ func validateKubeResources(roleVersion string, kubeResources []KubernetesResourc
 			}
 			fallthrough
 		case V7:
-			if kubeResource.Group != "" {
-				return trace.BadParameter("Group %q is not supported in role version %q. Upgrade the role version to %q", kubeResource.Group, roleVersion, V8)
+			if kubeResource.APIGroup != "" {
+				return trace.BadParameter("Group %q is not supported in role version %q. Upgrade the role version to %q", kubeResource.APIGroup, roleVersion, V8)
 			}
 			if !slices.Contains(KubernetesResourcesKinds, kubeResource.Kind) && kubeResource.Kind != Wildcard {
 				return trace.BadParameter("KubernetesResource kind %q is invalid or unsupported; Supported: %v", kubeResource.Kind, append([]string{Wildcard}, KubernetesResourcesKinds...))
 			}
 		case V8:
-			if kubeResource.Group == "" {
+			if kubeResource.APIGroup == "" {
 				return trace.BadParameter("KubernetesResource group is required in role version %q", roleVersion)
 			}
 		}

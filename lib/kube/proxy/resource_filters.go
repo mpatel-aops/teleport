@@ -654,7 +654,7 @@ func getKubeResource(kind, group, verb string, obj kubeObjectInterface) types.Ku
 		Namespace: obj.GetNamespace(),
 		Name:      obj.GetName(),
 		Verbs:     []string{verb},
-		Group:     group,
+		APIGroup:  group,
 	}
 }
 
@@ -698,14 +698,14 @@ func getKubeResourcePartialMetadataObject(kind, group, verb string, obj runtime.
 			Name:      o.GetName(),
 			Kind:      kind,
 			Verbs:     []string{verb},
-			Group:     group,
+			APIGroup:  group,
 		}, nil
 	case namer:
 		return types.KubernetesResource{
-			Name:  o.GetName(),
-			Kind:  kind,
-			Verbs: []string{verb},
-			Group: group,
+			Name:     o.GetName(),
+			Kind:     kind,
+			Verbs:    []string{verb},
+			APIGroup: group,
 		}, nil
 	default:
 		return types.KubernetesResource{}, trace.BadParameter("unexpected %T type", obj)

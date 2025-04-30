@@ -150,7 +150,7 @@ func matchListRequestShouldBeAllowed(sess *clusterSession, resourceKind, resourc
 		Kind:      resourceKind,
 		Namespace: sess.apiResource.namespace,
 		Verbs:     []string{sess.requestVerb},
-		Group:     resourceGroup,
+		APIGroup:  resourceGroup,
 	}
 
 	result, err := utils.KubeResourceCouldMatchRules(resource, deniedResources, types.Deny)

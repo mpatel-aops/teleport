@@ -135,7 +135,7 @@ func KubeResourceMatchesRegexWithVerbsCollector(input types.KubernetesResource, 
 		if input.Kind != resource.Kind && resource.Kind != types.Wildcard {
 			continue
 		}
-		if input.Group != resource.Group && resource.Group != types.Wildcard {
+		if input.APIGroup != resource.APIGroup && resource.APIGroup != types.Wildcard {
 			continue
 		}
 		switch ok, err := MatchString(input.Name, resource.Name); {
@@ -235,7 +235,7 @@ func KubeResourceMatchesRegex(input types.KubernetesResource, resources []types.
 			if input.Kind != resource.Kind && resource.Kind != types.Wildcard {
 				continue
 			}
-			if input.Group != resource.Group && resource.Group != types.Wildcard {
+			if input.APIGroup != resource.APIGroup && resource.APIGroup != types.Wildcard {
 				continue
 			}
 			switch ok, err := MatchString(input.Name, resource.Name); {
@@ -324,7 +324,7 @@ func KubeResourceCouldMatchRules(input types.KubernetesResource, resources []typ
 				continue
 			}
 			// If the group doesn't match and is not wildcard, skip.
-			if input.Group != resource.Group && resource.Group != types.Wildcard {
+			if input.APIGroup != resource.APIGroup && resource.APIGroup != types.Wildcard {
 				continue
 			}
 			// if the resource is cluster-wide, the command is deny and it's a wildcard resource

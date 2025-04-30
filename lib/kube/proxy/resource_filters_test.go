@@ -155,7 +155,7 @@ func Test_filterBuffer(t *testing.T) {
 			allowedResources := []types.KubernetesResource{
 				{
 					Kind:      r,
-					Group:     "*",
+					APIGroup:  "*",
 					Namespace: "default",
 					Name:      "*",
 					Verbs:     []string{types.KubeVerbList},
