@@ -218,7 +218,7 @@ spec:
     kubernetes_labels:
       '*': '*'
     kubernetes_resources:
-    - group: '*'
+    - api_group: '*'
       kind: pod
       name: '*'
       namespace: '*'
