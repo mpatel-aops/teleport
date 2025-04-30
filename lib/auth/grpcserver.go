@@ -2080,8 +2080,58 @@ func maybeDowngradeRoleVersionToV7(role *types.RoleV6, clientVersion *semver.Ver
 		role.Metadata.Labels = make(map[string]string, 1)
 	}
 	role.Metadata.Labels[types.TeleportDowngradedLabel] = reason
+
+	var allowed []types.KubernetesResource
+	for _, elem := range role.Spec.Allow.KubernetesResources {
+		// If group is '*', simply remove it as the behavior in v7 would be the same.
+		if elem.Group == types.Wildcard {
+			elem.Group = ""
+		}
+		// If Kind is known in v7 and group is known, remove it.
+		if _, ok := DefaultKnownRBACResources[elem.Group+elem.Kind]; ok {
+			elem.Group = ""
+		}
+		// If we have a known kind, keep it.
+		if _, ok := DefaultKnownRBACResources[elem.Kind]; ok {
+			allowed = append(allowed, elem)
+			continue
+		}
+		// Othwesie, drop the entry, we don't want to unexpectedly grant access to something.
+	}
+	role.Spec.Allow.KubernetesResources = allowed
+
+	var denied []types.KubernetesResource
+	for _, elem := range role.Spec.Deny.KubernetesResources {
+		// If group is '*', simply remove it as the behavior in v7 would be the same.
+		if elem.Group == types.Wildcard {
+			elem.Group = ""
+			denied = append(denied, elem)
+			continue
+		}
+		// If Kind is known in v7 and group is known, remove it.
+		if _, ok := DefaultKnownRBACResources[elem.Group+elem.Kind]; ok {
+			elem.Group = ""
+			denied = append(denied, elem)
+			continue
+		}
+		// Othwesie, set a wildcard to block everything.
+		denied = append(denied, types.KubernetesResource{
+			Kind:      types.Wildcard,
+			Name:      types.Wildcard,
+			Namespace: types.Wildcard,
+			Verbs:     []string{types.Wildcard},
+		})
+		// As we deny everything, no need to keep going.
+		break
+	}
+	role.Spec.Deny.KubernetesResources = denied
+
 	return role
 }
+
+// TODO(@creack): Delete in v19.0.0 along with the init() populating it in lib/kube/proxy/url.go.
+// Only used in the maybeDowngradeRoleVersionToV7 function above.
+var DefaultKnownRBACResources = map[string]struct{}{}
 
 var minSupportedSSHPortForwardingVersion = semver.Version{Major: 17, Minor: 1, Patch: 0}
 

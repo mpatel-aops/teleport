@@ -31,6 +31,7 @@ import (
 
 	"github.com/gravitational/teleport/api/types"
 	apievents "github.com/gravitational/teleport/api/types/events"
+	"github.com/gravitational/teleport/lib/auth"
 	"github.com/gravitational/teleport/lib/kube/proxy/responsewriters"
 )
 
@@ -183,7 +184,7 @@ func (r rbacSupportedResources) getTeleportResourceKindFromAPIResource(api apiRe
 
 // defaultRBACResources is a map of supported resources and their corresponding
 // teleport resource kind for the purpose of resource rbac.
-// TODO(@creack): Remove this.
+// TODO(@creack): Remove this (keep a form of it for maybedowngraderole).
 var defaultRBACResources = rbacSupportedResources{
 	{apiGroup: "core", resourceKind: "pods"}:                                      types.KindKubePod,
 	{apiGroup: "core", resourceKind: "secrets"}:                                   types.KindKubeSecret,
@@ -212,6 +213,15 @@ var defaultRBACResources = rbacSupportedResources{
 	{apiGroup: "extensions", resourceKind: "replicasets"}:                         types.KindKubeReplicaSet,
 	{apiGroup: "extensions", resourceKind: "daemonsets"}:                          types.KindKubeDaemonSet,
 	{apiGroup: "extensions", resourceKind: "ingresses"}:                           types.KindKubeIngress,
+}
+
+// TODO(@creack): Delete in v19.0.0 along with the populated map in lib/auth/grpcserver.go.
+// Only used in the maybeDowngradeRoleVersionToV7 function.
+func init() {
+	for k, v := range defaultRBACResources {
+		auth.DefaultKnownRBACResources[v] = struct{}{}
+		auth.DefaultKnownRBACResources[k.apiGroup+v] = struct{}{}
+	}
 }
 
 // getResourceFromRequest returns a KubernetesResource if the user tried to access
