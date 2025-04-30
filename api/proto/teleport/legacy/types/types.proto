@@ -3665,6 +3665,13 @@ message KubernetesResource {
   string Name = 3 [(gogoproto.jsontag) = "name,omitempty"];
   // Verbs are the allowed Kubernetes verbs for the following resource.
   repeated string Verbs = 4 [(gogoproto.jsontag) = "verbs,omitempty"];
+
+  // APIGroup specifies the API group of the resource. Can be '*' for any,
+  // but doesn't support pattern matching.
+  string APIGroup = 5 [(gogoproto.jsontag) = "api_group,omitempty"];
+
+  // For future use.
+  string SubResource = 6 [(gogoproto.jsontag) = "sub_resource,omitempty"];
 }
 
 // SessionRequirePolicy a requirement policy that needs to be fulfilled to grant access.
