@@ -222,7 +222,7 @@ func (c *Cache) CountAccessListMembers(ctx context.Context, accessListName strin
 		return count, listCount, trace.Wrap(err)
 	}
 
-	startKey := accessListName + "/" + accesslist.MembershipKindList
+	startKey := accessListName + "/" + accesslist.MembershipKindList + "/"
 	endKey := sortcache.NextKey(startKey)
 	listCount := uint32(rg.store.count(accessListMemberStoreKindIndex, startKey, endKey))
 
