@@ -85,9 +85,9 @@ type collections struct {
 	networkingConfig                 *collection[types.ClusterNetworkingConfig, clusterNetworkingConfigIndex]
 	authPreference                   *collection[types.AuthPreference, authPreferenceIndex]
 	sessionRecordingConfig           *collection[types.SessionRecordingConfig, sessionRecordingConfigIndex]
-	autoUpdateConfig                 *collection[*autoupdatev1.AutoUpdateConfig]
-	autoUpdateVerion                 *collection[*autoupdatev1.AutoUpdateVersion]
-	autoUpdateRollout                *collection[*autoupdatev1.AutoUpdateAgentRollout]
+	autoUpdateConfig                 *collection[*autoupdatev1.AutoUpdateConfig, autoUpdateConfigIndex]
+	autoUpdateVerion                 *collection[*autoupdatev1.AutoUpdateVersion, autoUpdateVersionIndex]
+	autoUpdateRollout                *collection[*autoupdatev1.AutoUpdateAgentRollout, autoUpdateAgentRolloutIndex]
 }
 
 // setupCollections ensures that the appropriate [collection] is
