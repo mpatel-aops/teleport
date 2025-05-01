@@ -469,12 +469,13 @@ func (r *RoleV6) GetKubeResources(rct RoleConditionType) []KubernetesResource {
 // convertKubeResourcesBetweenRoleVersions converts Kubernetes resources between role versions.
 // This is required to keep compatibility between role versions to avoid breaking changes
 // when upgrading Teleport.
-// For roles v7, it returns the list as it is.
+// For roles v8, it returns the list as it is.
+// For roles v7, it sets the APIGroup to wildcard for all resources.
 // For older roles <v7, if the kind is pod and name and namespace are wildcards,
 // then return a wildcard resource since RoleV6 and below do not restrict access
 // to other resources. This is a simple optimization to reduce the number of resources.
 // Finally, if the older role version is not a wildcard, then it returns the pod resources as is
-// and append the other supported resources - KubernetesResourcesKinds - for Role v7.
+// and append the other supported resources - KubernetesResourcesKinds - for Role v8.
 func (r *RoleV6) convertKubernetesResourcesBetweenRoleVersions(resources []KubernetesResource) []KubernetesResource {
 	switch r.Version {
 	case V8:
