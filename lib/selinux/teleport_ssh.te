@@ -27,6 +27,7 @@ require {
     type sssd_var_lib_t;
     type syslogd_var_run_t;
     type systemd_logind_t;
+    type systemd_logind_sessions_t;
     type systemd_unit_file_t;
     type systemd_systemctl_exec_t;
     type sysctl_net_t;
@@ -146,6 +147,7 @@ allow teleport_ssh_t user_devpts_t:chr_file { rw_chr_file_perms relabelfrom };
 ##
 systemd_exec_systemctl(teleport_ssh_t);
 allow teleport_ssh_t init_t:unix_stream_socket connectto;
+allow teleport_ssh_t systemd_logind_sessions_t:fifo_file write;
 
 ##
 # networking
@@ -192,12 +194,6 @@ allow teleport_ssh_t chkpwd_t:process { noatsecure rlimitinh siginh };
 allow teleport_ssh_t systemd_logind_t:dbus send_msg;
 allow teleport_ssh_t self:capability { net_admin };
 
-allow teleport_ssh_t selinux_config_t:file read_file_perms;
-allow teleport_ssh_t security_t:dir list_dir_perms;
-allow teleport_ssh_t security_t:file { getattr open read write map };
-# these are read-only permissions: https://github.com/SELinuxProject/selinux-notebook/blob/main/src/object_classes_permissions.md#security-object-class
-allow teleport_ssh_t security_t:security { check_context compute_av compute_relabel };
-
 # login data
 allow teleport_ssh_t initrc_var_run_t:file rw_file_perms;
 allow teleport_ssh_t wtmp_t:file rw_file_perms;
@@ -221,6 +217,8 @@ optional_policy(`
 ')
 
 # PAM
+auth_use_pam(teleport_ssh_t);
+
 allow teleport_ssh_t pam_var_run_t:dir list_dir_perms;
 allow teleport_ssh_t pam_var_run_t:file read_file_perms;
 
@@ -233,6 +231,12 @@ allow systemd_logind_t teleport_ssh_t:dbus send_msg;
 allow teleport_ssh_t syslogd_var_run_t:dir list_dir_perms;
 allow teleport_ssh_t syslogd_var_run_t:file { read_file_perms map };
 allow teleport_ssh_t tmpfs_t:filesystem getattr;
+
+allow teleport_ssh_t selinux_config_t:file read_file_perms;
+allow teleport_ssh_t security_t:dir list_dir_perms;
+allow teleport_ssh_t security_t:file { getattr open read write map };
+# these are read-only permissions: https://github.com/SELinuxProject/selinux-notebook/blob/main/src/object_classes_permissions.md#security-object-class
+allow teleport_ssh_t security_t:security { check_context compute_av compute_relabel };
 
 # motd
 # not available on RHEL 8
