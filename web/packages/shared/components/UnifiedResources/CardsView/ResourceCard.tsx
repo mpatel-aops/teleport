@@ -232,11 +232,22 @@ export function ResourceCard({
           {/* MinWidth is important to prevent descriptions from overflowing. */}
           <Flex flexDirection="column" flex="1" minWidth="0" ml={3} gap={1}>
             <Flex flexDirection="row" alignItems="center">
-              <SingleLineBox flex="1">
-                <HoverTooltip tipContent={name} showOnlyOnOverflow>
-                  <Text typography="body1">{name}</Text>
-                </HoverTooltip>
-              </SingleLineBox>
+              <Flex flex="1" minWidth="0" alignItems="center" gap={2}>
+                <SingleLineBox flex="none" maxWidth="100%">
+                  <HoverTooltip tipContent={name} showOnlyOnOverflow>
+                    <Text typography="body1">{name}</Text>
+                  </HoverTooltip>
+                </SingleLineBox>
+                {cardViewProps.titleSuffix && (
+                  <HoverTooltip tipContent={cardViewProps.titleSuffix} showOnlyOnOverflow>
+                    <SuffixPill>
+                      <Text typography="body3" color="text.slightlyMuted">
+                        {cardViewProps.titleSuffix}
+                      </Text>
+                    </SuffixPill>
+                  </HoverTooltip>
+                )}
+              </Flex>
               {hovered && <CopyButton name={name} mr={2} />}
               <ResourceActionButtonWrapper requiresRequest={requiresRequest}>
                 {ActionButton}
@@ -519,4 +530,15 @@ const MoreLabelsButton = styled(ButtonLink)`
   &:hover {
     background-color: transparent;
   }
+`;
+
+const SuffixPill = styled.div`
+  border-radius: ${p => p.theme.radii[2]}px;
+  background-color: ${p => p.theme.colors.levels.sunken};
+  border: ${p => p.theme.borders[1]} ${p => p.theme.colors.spotBackground[0]};
+  padding: 0 ${p => p.theme.space[2]}px;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

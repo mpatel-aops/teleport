@@ -50,6 +50,12 @@ export function makeUnifiedResourceViewItemNode(
   const nodeSubKind = formatNodeSubKind(resource.subKind);
   const addressIfNotTunnel = resource.tunnel ? '' : resource.addr;
 
+  // If present, surface the AWS Name label value on the card without requiring label expansion.
+  const awsNameLabel = resource.labels.find(l => l.name === 'aws/Name');
+  const awsName = (awsNameLabel?.value || '').trim();
+  // Keep secondary description as address only to avoid duplicating the AWS name.
+  const secondaryDescCombined = addressIfNotTunnel;
+
   return {
     name: resource.hostname,
     SecondaryIcon: ServerIcon,
@@ -58,11 +64,13 @@ export function makeUnifiedResourceViewItemNode(
     labels: resource.labels,
     cardViewProps: {
       primaryDesc: nodeSubKind,
-      secondaryDesc: addressIfNotTunnel,
+      secondaryDesc: secondaryDescCombined,
+      titleSuffix: awsName,
     },
     listViewProps: {
       resourceType: nodeSubKind,
       addr: addressIfNotTunnel,
+      titleSuffix: awsName,
     },
     requiresRequest: resource.requiresRequest,
   };
