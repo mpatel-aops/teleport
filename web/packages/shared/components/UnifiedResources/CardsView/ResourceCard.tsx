@@ -541,4 +541,5 @@ const SuffixPill = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-right: ${p => p.theme.space[2]}px;
 `;

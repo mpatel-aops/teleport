@@ -133,3 +133,41 @@ export const ListItems: Story = {
     );
   },
 };
+
+export const NodeWithLongAwsName: Story = {
+  render() {
+    const longAwsNameNode = makeUnifiedResourceViewItemNode(
+      {
+        kind: 'node',
+        id: 'n-long',
+        hostname: 'aops-dev-i-0a29549ea62aeae08',
+        labels: [
+          { name: 'cluster', value: 'one' },
+          { name: 'aws/Name', value: 'devops1.aopstest.com' },
+        ],
+        addr: '172.10.1.20:3022',
+        tunnel: false,
+        subKind: 'teleport',
+        requiresRequest: false,
+      },
+      { ActionButton }
+    );
+
+    return (
+      <Flex flexDirection="column">
+        <ResourceListItem
+          pinned={false}
+          pinResource={() => {}}
+          selectResource={() => {}}
+          selected={false}
+          pinningSupport={PinningSupport.Supported}
+          expandAllLabels={false}
+          onLabelClick={() => {}}
+          onShowStatusInfo={() => null}
+          showingStatusInfo={false}
+          viewItem={longAwsNameNode}
+        />
+      </Flex>
+    );
+  },
+};

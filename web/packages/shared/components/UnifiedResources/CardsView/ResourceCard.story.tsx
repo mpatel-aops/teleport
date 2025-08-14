@@ -153,3 +153,43 @@ export const Cards: Story = {
     );
   },
 };
+
+export const CardNodeWithLongAwsName: Story = {
+  render() {
+    const longAwsNameNode = makeUnifiedResourceViewItemNode(
+      {
+        kind: 'node',
+        id: 'n-long-card',
+        hostname: 'aops-dev-i-0a29549ea62aeae08',
+        labels: [
+          { name: 'cluster', value: 'one' },
+          { name: 'aws/Name', value: 'aops-dev-i-0a29549ea62aeae08' },
+        ],
+        addr: '172.10.1.20:3022',
+        tunnel: false,
+        subKind: 'teleport',
+        requiresRequest: false,
+      },
+      { ActionButton }
+    );
+
+    return (
+      <MemoryRouter>
+        <SamlAppActionProvider>
+          <Grid gap={2}>
+            <ResourceCard
+              pinned={false}
+              pinResource={() => {}}
+              selectResource={() => {}}
+              selected={false}
+              pinningSupport={PinningSupport.Supported}
+              onShowStatusInfo={() => null}
+              showingStatusInfo={false}
+              viewItem={longAwsNameNode}
+            />
+          </Grid>
+        </SamlAppActionProvider>
+      </MemoryRouter>
+    );
+  },
+};
