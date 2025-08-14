@@ -143,7 +143,7 @@ export const NodeWithLongAwsName: Story = {
         hostname: 'aops-dev-i-0a29549ea62aeae08',
         labels: [
           { name: 'cluster', value: 'one' },
-          { name: 'aws/Name', value: 'devops1.aopstest.com' },
+          { name: 'aws/Name', value: 'aops-dev-i-0a29549ea62aeae08-super-super-long-name' },
         ],
         addr: '172.10.1.20:3022',
         tunnel: false,

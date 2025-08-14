@@ -163,7 +163,7 @@ export const CardNodeWithLongAwsName: Story = {
         hostname: 'aops-dev-i-0a29549ea62aeae08',
         labels: [
           { name: 'cluster', value: 'one' },
-          { name: 'aws/Name', value: 'aops-dev-i-0a29549ea62aeae08' },
+          { name: 'aws/Name', value: 'aops-dev-i-0a29549ea62aeae08-super-long' },
         ],
         addr: '172.10.1.20:3022',
         tunnel: false,
