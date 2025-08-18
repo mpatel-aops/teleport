@@ -167,10 +167,10 @@ export function ResourceListItem({
                 alignItems="center"
                 css={`
                   min-width: 0;
-                  overflow: hidden;
-                `}
-              >
-                <HoverTooltip tipContent={name} showOnlyOnOverflow>
+              overflow: hidden;
+            `}
+          >
+            <HoverTooltip tipContent={name} showOnlyOnOverflow>
                   <Name
                     css={`
                       min-width: 0;
@@ -190,7 +190,7 @@ export function ResourceListItem({
                       {titleSuffix}
                     </Text>
                   </ListSuffixPill>
-                </HoverTooltip>
+            </HoverTooltip>
               )}
             </Flex>
             {/* Second row: description */}

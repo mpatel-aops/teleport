@@ -234,10 +234,10 @@ export function ResourceCard({
             <Flex flexDirection="row" alignItems="center">
               <Flex flex="1" minWidth="0" alignItems="center" gap={2}>
                 <SingleLineBox flex="none" maxWidth="100%">
-                  <HoverTooltip tipContent={name} showOnlyOnOverflow>
-                    <Text typography="body1">{name}</Text>
-                  </HoverTooltip>
-                </SingleLineBox>
+                <HoverTooltip tipContent={name} showOnlyOnOverflow>
+                  <Text typography="body1">{name}</Text>
+                </HoverTooltip>
+              </SingleLineBox>
                 {cardViewProps.titleSuffix && (
                   <HoverTooltip tipContent={cardViewProps.titleSuffix} showOnlyOnOverflow>
                     <SuffixPill>
