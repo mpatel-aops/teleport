@@ -61,7 +61,7 @@ export function ResourceListItem({
     requiresRequest = false,
     status,
   } = viewItem;
-  const { description, resourceType, addr } = listViewProps;
+  const { description, resourceType, addr, titleSuffix } = listViewProps;
 
   const [showLabels, setShowLabels] = useState(expandAllLabels);
   const [hovered, setHovered] = useState(false);
@@ -151,22 +151,53 @@ export function ResourceListItem({
             flexDirection="column"
             css={`
               overflow: hidden;
+              width: 100%;
+            `}
+          >
+            {/* Top row: name + copy button, and AWS name pill on the same row */}
+            <Flex
+              alignItems="center"
+              css={`
+                overflow: hidden;
+                width: 100%;
+                gap: ${props => props.theme.space[2]}px;
+              `}
+            >
+              <Flex
+                alignItems="center"
+                css={`
+                  min-width: 0;
+              overflow: hidden;
             `}
           >
             <HoverTooltip tipContent={name} showOnlyOnOverflow>
-              <Name>{name}</Name>
+                  <Name
+                    css={`
+                      min-width: 0;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    `}
+                  >
+                    {name}
+                  </Name>
+                </HoverTooltip>
+                {hovered && <CopyButton name={name} ml={1} />}
+              </Flex>
+              {titleSuffix && (
+                <HoverTooltip tipContent={titleSuffix} showOnlyOnOverflow>
+                  <ListSuffixPill>
+                    <Text fontSize="12px" color="text.slightlyMuted">
+                      {titleSuffix}
+                    </Text>
+                  </ListSuffixPill>
             </HoverTooltip>
+              )}
+            </Flex>
+            {/* Second row: description */}
             <HoverTooltip tipContent={description} showOnlyOnOverflow>
               <Description>{description}</Description>
             </HoverTooltip>
           </Flex>
-          <Box
-            css={`
-              align-self: start;
-            `}
-          >
-            {hovered && <CopyButton name={name} ml={1} />}
-          </Box>
         </Flex>
 
         {/* type */}
@@ -383,6 +414,19 @@ const Name = styled(Text)`
   white-space: nowrap;
   line-height: 20px;
   font-weight: 300;
+`;
+
+const ListSuffixPill = styled.div`
+  border-radius: ${p => p.theme.radii[2]}px;
+  background-color: ${p => p.theme.colors.levels.sunken};
+  border: ${p => p.theme.borders[1]} ${p => p.theme.colors.spotBackground[0]};
+  padding: 0 ${p => p.theme.space[2]}px;
+  max-width: 50%;
+  align-self: center;
+  margin-left: ${p => p.theme.space[2]}px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const Description = styled(Text)`

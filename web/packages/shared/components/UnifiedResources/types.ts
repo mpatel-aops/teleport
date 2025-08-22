@@ -226,12 +226,16 @@ export type ResourceItemProps = {
 type CardViewSpecificProps = {
   primaryDesc?: string;
   secondaryDesc?: string;
+  /** Optional short text to render inline next to the title (eg: AWS Name). */
+  titleSuffix?: string;
 };
 
 type ListViewSpecificProps = {
   description?: string;
   addr?: string;
   resourceType: string;
+  /** Optional short text to render inline next to the title (eg: AWS Name). */
+  titleSuffix?: string;
 };
 
 export type UnifiedResourcesPinning =

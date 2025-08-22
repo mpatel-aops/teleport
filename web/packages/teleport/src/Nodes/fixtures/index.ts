@@ -37,6 +37,10 @@ export const nodes: Node[] = [
         name: 'kernel',
         value: '4.15.0-51-generic',
       },
+      {
+        name: 'aws/Name',
+        value: 'MyEC2Server',
+      },
     ],
   },
   {
